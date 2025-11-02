@@ -4,21 +4,23 @@
  */
 
 function initFooter() {
-    const footer = document.querySelector('footer');
-    
+    const footer = document.querySelector("footer");
+
     if (!footer) {
         return;
     }
-    
+
     // تشخیص URL فعلی ریپو از context
-    const currentRepoUrl = document.querySelector('link[rel="canonical"]')?.href || 
-                          window.location.origin + window.location.pathname.split('/')[1] || 
-                          'https://github.com/alireza-haeri/Dp';
-    
+    const currentRepoUrl =
+        document.querySelector('link[rel="canonical"]')?.href ||
+        window.location.origin + window.location.pathname.split("/")[1] ||
+        "https://github.com/alireza-haeri/Dp";
+
     // استخراج نام ریپو از URL
-    const repoPath = window.location.pathname.split('/').filter(p => p)[0] || 'Dp';
+    const repoPath =
+        window.location.pathname.split("/").filter((p) => p)[0] || "Dp";
     const githubRepoUrl = `https://github.com/alireza-haeri/${repoPath}`;
-    
+
     // محتوای فوتر
     const footerContent = `
         <div class="container">
@@ -30,13 +32,13 @@ function initFooter() {
             </div>
         </div>
     `;
-    
+
     footer.innerHTML = footerContent;
 }
 
 // اجرا بعد از بارگذاری صفحه
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFooter);
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFooter);
 } else {
     initFooter();
 }
