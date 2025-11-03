@@ -1,0 +1,199 @@
+<h1>الگوی Memento (یادگار)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Memento یک الگوی طراحی رفتاری است که به شما اجازه می‌دهد snapshot هایی از حالت یک شیء را ذخیره و بازیابی کنید بدون افشای جزئیات پیاده‌سازی آن.</p>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+namespace MementoPattern
+{
+    // کلاس Memento - ذخیره‌ساز حالت شیء
+    // این کلاس یک snapshot از وضعیت شیء را نگه می‌دارد
+    public class Memento
+    {
+        private readonly string _state;
+        private readonly DateTime _timestamp;
+
+        // سازنده: حالت را دریافت و زمان را ثبت می‌کند
+        public Memento(string state)
+        {
+            _state = state;
+            _timestamp = DateTime.Now;
+        }
+
+        // دریافت حالت ذخیره شده
+        public string GetState()
+        {
+            return _state;
+        }
+
+        // دریافت زمان ذخیره‌سازی
+        public string GetTimestamp()
+        {
+            return _timestamp.ToString(&quot;yyyy-MM-dd HH:mm:ss&quot;);
+        }
+    }
+
+    // کلاس TextEditor - شیء اصلی که حالت آن ذخیره می‌شود (Originator)
+    // این کلاس می‌تواند حالت خود را ذخیره و بازیابی کند
+    public class TextEditor
+    {
+        private string _content;
+
+        // سازنده: مقداردهی اولیه محتوا
+        public TextEditor()
+        {
+            _content = &quot;&quot;;
+        }
+
+        // نوشتن متن جدید به محتوای موجود
+        public void Write(string text)
+        {
+            _content += text;
+            Console.WriteLine($&quot;✍️ نوشته شد: {text}&quot;);
+        }
+
+        // دریافت محتوای فعلی
+        public string GetContent()
+        {
+            return _content;
+        }
+
+        // ذخیره وضعیت فعلی در یک Memento
+        public Memento Save()
+        {
+            Console.WriteLine($&quot;💾 ذخیره وضعیت: {_content}&quot;);
+            return new Memento(_content);
+        }
+
+        // بازیابی وضعیت از یک Memento
+        public void Restore(Memento memento)
+        {
+            _content = memento.GetState();
+            Console.WriteLine($&quot;↩️ بازیابی به: {_content}&quot;);
+        }
+    }
+
+    // کلاس History - مدیریت تاریخچه Memento ها (Caretaker)
+    // این کلاس Memento ها را نگهداری می‌کند بدون دسترسی به محتوای آنها
+    public class History
+    {
+        private readonly Stack&lt;Memento&gt; _mementos;
+
+        // سازنده: ایجاد لیست برای نگهداری Memento ها
+        public History()
+        {
+            _mementos = new Stack&lt;Memento&gt;();
+        }
+
+        // اضافه کردن Memento به تاریخچه
+        public void Push(Memento memento)
+        {
+            _mementos.Push(memento);
+        }
+
+        // برداشتن آخرین Memento از تاریخچه
+        public Memento Pop()
+        {
+            if (_mementos.Count &gt; 0)
+            {
+                return _mementos.Pop();
+            }
+            return null;
+        }
+    }
+
+    // برنامه اصلی - نمایش استفاده از الگوی Memento
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // تنظیم کنسول برای نمایش فارسی
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine(&quot;🎯 الگوی Memento - مثال ویرایشگر متن با قابلیت Undo&quot;);
+            Console.WriteLine(&quot;═══════════════════════════════════════════════════════\n&quot;);
+
+            // ایجاد ویرایشگر و تاریخچه
+            TextEditor editor = new TextEditor();
+            History history = new History();
+
+            // مرحله 1: نوشتن اولین متن و ذخیره
+            Console.WriteLine(&quot;📝 مرحله 1: نوشتن متن اول&quot;);
+            editor.Write(&quot;سلام &quot;);
+            history.Push(editor.Save());
+            Console.WriteLine();
+
+            // مرحله 2: اضافه کردن متن دوم و ذخیره
+            Console.WriteLine(&quot;📝 مرحله 2: اضافه کردن متن دوم&quot;);
+            editor.Write(&quot;دنیا!&quot;);
+            history.Push(editor.Save());
+            Console.WriteLine();
+
+            // مرحله 3: اضافه کردن متن سوم (بدون ذخیره)
+            Console.WriteLine(&quot;📝 مرحله 3: اضافه کردن متن سوم&quot;);
+            editor.Write(&quot; چطوری؟&quot;);
+            Console.WriteLine($&quot;📄 محتوای فعلی: {editor.GetContent()}&quot;);
+            Console.WriteLine();
+
+            // مرحله 4: بازگشت به وضعیت قبلی (Undo)
+            Console.WriteLine(&quot;🔄 مرحله 4: بازگشت به وضعیت قبلی&quot;);
+            Memento memento = history.Pop();
+            if (memento != null)
+            {
+                editor.Restore(memento);
+                Console.WriteLine($&quot;📄 محتوای بعد از Undo: {editor.GetContent()}&quot;);
+            }
+            Console.WriteLine();
+
+            // مرحله 5: بازگشت به وضعیت اولیه
+            Console.WriteLine(&quot;🔄 مرحله 5: بازگشت به وضعیت اولیه&quot;);
+            memento = history.Pop();
+            if (memento != null)
+            {
+                editor.Restore(memento);
+                Console.WriteLine($&quot;📄 محتوای بعد از Undo دوم: {editor.GetContent()}&quot;);
+            }
+
+            Console.WriteLine(&quot;\n✅ اتمام نمایش الگوی Memento&quot;);
+            Console.ReadKey();
+        }
+    }
+}
+</code></pre>
+<h3>📤 خروجی برنامه:</h3>
+<pre><code>🎯 الگوی Memento - مثال ویرایشگر متن با قابلیت Undo
+═══════════════════════════════════════════════════════
+
+📝 مرحله 1: نوشتن متن اول
+✍️ نوشته شد: سلام 
+💾 ذخیره وضعیت: سلام 
+
+📝 مرحله 2: اضافه کردن متن دوم
+✍️ نوشته شد: دنیا!
+💾 ذخیره وضعیت: سلام دنیا!
+
+📝 مرحله 3: اضافه کردن متن سوم
+✍️ نوشته شد:  چطوری؟
+📄 محتوای فعلی: سلام دنیا! چطوری؟
+
+🔄 مرحله 4: بازگشت به وضعیت قبلی
+↩️ بازیابی به: سلام دنیا!
+📄 محتوای بعد از Undo: سلام دنیا!
+
+🔄 مرحله 5: بازگشت به وضعیت اولیه
+↩️ بازیابی به: سلام 
+📄 محتوای بعد از Undo دوم: سلام 
+
+✅ اتمام نمایش الگوی Memento
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li>زمانی که می‌خواهید snapshot هایی از حالت شیء تولید کنید</li>
+<li>زمانی که دسترسی مستقیم به فیلدهای شیء کپسوله‌سازی را نقض می‌کند</li>
+<li>برای پیاده‌سازی Undo/Redo</li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Memento حالت گذشته را ذخیره و بازیابی می‌کند! 📸</p>
+</blockquote>

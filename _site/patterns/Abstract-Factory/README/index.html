@@ -1,0 +1,452 @@
+<h1>الگوی Abstract Factory (کارخانه انتزاعی)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Abstract Factory یک الگوی طراحی سازنده است که به شما اجازه می‌دهد خانواده‌هایی از اشیاء مرتبط یا وابسته را بدون مشخص کردن کلاس‌های مشخص آن‌ها تولید کنید.</p>
+<h2>🤔 مشکل</h2>
+<p>تصور کنید یک فروشگاه مبلمان شبیه‌ساز دارید. کد شما شامل کلاس‌هایی است که نشان‌دهنده:</p>
+<ul>
+<li>خانواده‌ای از محصولات مرتبط است، مثلاً: <code>صندلی</code> + <code>مبل</code> + <code>میز قهوه</code></li>
+<li>چندین نوع مختلف از این خانواده. به عنوان مثال، محصولات <code>صندلی</code> + <code>مبل</code> + <code>میز قهوه</code> در این سبک‌ها موجود است: <code>مدرن</code>، <code>ویکتوریا</code>، <code>هنری</code></li>
+</ul>
+<p>شما به راهی نیاز دارید که اشیاء مبلمان را طوری ایجاد کنید که با دیگر اشیاء همان خانواده مطابقت داشته باشند. مشتریان زمانی ناراحت می‌شوند که مبلمان نامطابق دریافت می‌کنند.</p>
+<h2>💡 راه‌حل</h2>
+<p>اولین کاری که الگوی Abstract Factory پیشنهاد می‌کند این است که به صورت صریح رابط‌هایی برای هر محصول متمایز از خانواده محصولات اعلام کنید. سپس می‌توانید تمام انواع محصولات را پیروی از این رابط‌ها کنید.</p>
+<p>گام بعدی اعلام Abstract Factory است - یک رابط با لیستی از متدهای ایجاد برای تمام محصولاتی که بخشی از خانواده محصول هستند.</p>
+<h2>👥 شرکت‌کنندگان</h2>
+<ol>
+<li><strong>AbstractFactory</strong>: رابطی برای ایجاد محصولات انتزاعی اعلام می‌کند</li>
+<li><strong>ConcreteFactory</strong>: متدهای ایجاد را برای تولید محصولات مشخص پیاده‌سازی می‌کند</li>
+<li><strong>AbstractProduct</strong>: رابط برای یک نوع محصول</li>
+<li><strong>ConcreteProduct</strong>: محصول خاص که توسط کارخانه متناظر ایجاد می‌شود</li>
+<li><strong>Client</strong>: فقط از طریق رابط‌های انتزاعی با کارخانه‌ها و محصولات کار می‌کند</li>
+</ol>
+<h2>🔄 نحوه همکاری</h2>
+<ul>
+<li>معمولاً در زمان اجرا فقط یک نمونه از ConcreteFactory ایجاد می‌شود</li>
+<li>AbstractFactory ایجاد اشیاء محصول را به زیرکلاس‌های ConcreteFactory واگذار می‌کند</li>
+</ul>
+<h2>⚖️ پیامدها</h2>
+<h3>مزایا ✅</h3>
+<ul>
+<li><strong>سازگاری محصولات</strong>: اطمینان می‌دهید که محصولات از یک خانواده با هم سازگار هستند</li>
+<li><strong>جداسازی از کلاس‌های مشخص</strong>: کد کلاینت را از کلاس‌های مشخص محصول جدا می‌کند</li>
+<li><strong>اصل تک مسئولیتی</strong>: کد ایجاد محصول را در یک مکان متمرکز می‌کنید</li>
+<li><strong>اصل باز/بسته</strong>: معرفی انواع جدید محصولات بدون شکستن کد موجود</li>
+</ul>
+<h3>معایب ❌</h3>
+<ul>
+<li>پیچیدگی کد افزایش می‌یابد زیرا رابط‌ها و کلاس‌های زیادی معرفی می‌شوند</li>
+<li>اضافه کردن محصول جدید به خانواده نیازمند تغییر در تمام کارخانه‌ها است</li>
+</ul>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+
+namespace AbstractFactoryPattern
+{
+    // Abstract Products - محصولات انتزاعی
+    public interface IChair
+    {
+        string SitOn();
+    }
+
+    public interface ISofa
+    {
+        string LieOn();
+    }
+
+    public interface ICoffeeTable
+    {
+        string PutOn();
+    }
+
+    // Concrete Products - Modern Style
+    public class ModernChair : IChair
+    {
+        public string SitOn()
+        {
+            return &quot;🪑 نشستن روی صندلی مدرن و شیک&quot;;
+        }
+    }
+
+    public class ModernSofa : ISofa
+    {
+        public string LieOn()
+        {
+            return &quot;🛋️ دراز کشیدن روی مبل مدرن&quot;;
+        }
+    }
+
+    public class ModernCoffeeTable : ICoffeeTable
+    {
+        public string PutOn()
+        {
+            return &quot;☕ قرار دادن فنجان روی میز قهوه مدرن&quot;;
+        }
+    }
+
+    // Concrete Products - Victorian Style
+    public class VictorianChair : IChair
+    {
+        public string SitOn()
+        {
+            return &quot;🪑 نشستن روی صندلی ویکتوریایی کلاسیک&quot;;
+        }
+    }
+
+    public class VictorianSofa : ISofa
+    {
+        public string LieOn()
+        {
+            return &quot;🛋️ دراز کشیدن روی مبل ویکتوریایی تزئین شده&quot;;
+        }
+    }
+
+    public class VictorianCoffeeTable : ICoffeeTable
+    {
+        public string PutOn()
+        {
+            return &quot;☕ قرار دادن فنجان روی میز قهوه ویکتوریایی منبت‌کاری شده&quot;;
+        }
+    }
+
+    // Concrete Products - Art Deco Style
+    public class ArtDecoChair : IChair
+    {
+        public string SitOn()
+        {
+            return &quot;🪑 نشستن روی صندلی آرت دکو هنری&quot;;
+        }
+    }
+
+    public class ArtDecoSofa : ISofa
+    {
+        public string LieOn()
+        {
+            return &quot;🛋️ دراز کشیدن روی مبل آرت دکو با طراحی هندسی&quot;;
+        }
+    }
+
+    public class ArtDecoCoffeeTable : ICoffeeTable
+    {
+        public string PutOn()
+        {
+            return &quot;☕ قرار دادن فنجان روی میز قهوه آرت دکو&quot;;
+        }
+    }
+
+    // Abstract Factory - کارخانه انتزاعی
+    public interface IFurnitureFactory
+    {
+        IChair CreateChair();
+        ISofa CreateSofa();
+        ICoffeeTable CreateCoffeeTable();
+    }
+
+    // Concrete Factories - کارخانه‌های مشخص
+    public class ModernFurnitureFactory : IFurnitureFactory
+    {
+        public IChair CreateChair()
+        {
+            return new ModernChair();
+        }
+
+        public ISofa CreateSofa()
+        {
+            return new ModernSofa();
+        }
+
+        public ICoffeeTable CreateCoffeeTable()
+        {
+            return new ModernCoffeeTable();
+        }
+    }
+
+    public class VictorianFurnitureFactory : IFurnitureFactory
+    {
+        public IChair CreateChair()
+        {
+            return new VictorianChair();
+        }
+
+        public ISofa CreateSofa()
+        {
+            return new VictorianSofa();
+        }
+
+        public ICoffeeTable CreateCoffeeTable()
+        {
+            return new VictorianCoffeeTable();
+        }
+    }
+
+    public class ArtDecoFurnitureFactory : IFurnitureFactory
+    {
+        public IChair CreateChair()
+        {
+            return new ArtDecoChair();
+        }
+
+        public ISofa CreateSofa()
+        {
+            return new ArtDecoSofa();
+        }
+
+        public ICoffeeTable CreateCoffeeTable()
+        {
+            return new ArtDecoCoffeeTable();
+        }
+    }
+
+    // Client Code - کد کلاینت
+    class Program
+    {
+        static void FurnishRoom(IFurnitureFactory factory)
+        {
+            IChair chair = factory.CreateChair();
+            ISofa sofa = factory.CreateSofa();
+            ICoffeeTable table = factory.CreateCoffeeTable();
+
+            Console.WriteLine(chair.SitOn());
+            Console.WriteLine(sofa.LieOn());
+            Console.WriteLine(table.PutOn());
+            Console.WriteLine();
+        }
+
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine(&quot;🏭 الگوی Abstract Factory - فروشگاه مبلمان\n&quot;);
+            Console.WriteLine(new string('=', 60));
+
+            Console.WriteLine(&quot;\n🎨 دکوراسیون مدرن:&quot;);
+            Console.WriteLine(new string('-', 60));
+            IFurnitureFactory modernFactory = new ModernFurnitureFactory();
+            FurnishRoom(modernFactory);
+
+            Console.WriteLine(&quot;👑 دکوراسیون ویکتوریایی:&quot;);
+            Console.WriteLine(new string('-', 60));
+            IFurnitureFactory victorianFactory = new VictorianFurnitureFactory();
+            FurnishRoom(victorianFactory);
+
+            Console.WriteLine(&quot;🎭 دکوراسیون آرت دکو:&quot;);
+            Console.WriteLine(new string('-', 60));
+            IFurnitureFactory artDecoFactory = new ArtDecoFurnitureFactory();
+            FurnishRoom(artDecoFactory);
+
+            Console.WriteLine(new string('=', 60));
+        }
+    }
+}
+</code></pre>
+<h3>📤 خروجی برنامه:</h3>
+<pre><code>🏭 الگوی Abstract Factory - فروشگاه مبلمان
+
+============================================================
+
+🎨 دکوراسیون مدرن:
+------------------------------------------------------------
+🪑 نشستن روی صندلی مدرن و شیک
+🛋️ دراز کشیدن روی مبل مدرن
+☕ قرار دادن فنجان روی میز قهوه مدرن
+
+👑 دکوراسیون ویکتوریایی:
+------------------------------------------------------------
+🪑 نشستن روی صندلی ویکتوریایی کلاسیک
+🛋️ دراز کشیدن روی مبل ویکتوریایی تزئین شده
+☕ قرار دادن فنجان روی میز قهوه ویکتوریایی منبت‌کاری شده
+
+🎭 دکوراسیون آرت دکو:
+------------------------------------------------------------
+🪑 نشستن روی صندلی آرت دکو هنری
+🛋️ دراز کشیدن روی مبل آرت دکو با طراحی هندسی
+☕ قرار دادن فنجان روی میز قهوه آرت دکو
+
+============================================================
+</code></pre>
+<h2>🎯 مثال کاربردی واقعی</h2>
+<h3>مثال 1: رابط کاربری چند پلتفرمی</h3>
+<pre><code class="language-csharp">// Abstract Products
+public interface IButton
+{
+    string Render();
+}
+
+public interface ICheckbox
+{
+    string Render();
+}
+
+// Concrete Products - Windows
+public class WindowsButton : IButton
+{
+    public string Render()
+    {
+        return &quot;🖱️ دکمه ویندوزی رندر شد&quot;;
+    }
+}
+
+public class WindowsCheckbox : ICheckbox
+{
+    public string Render()
+    {
+        return &quot;☑️ چک‌باکس ویندوزی رندر شد&quot;;
+    }
+}
+
+// Concrete Products - MacOS
+public class MacOSButton : IButton
+{
+    public string Render()
+    {
+        return &quot;🖱️ دکمه MacOS رندر شد&quot;;
+    }
+}
+
+public class MacOSCheckbox : ICheckbox
+{
+    public string Render()
+    {
+        return &quot;☑️ چک‌باکس MacOS رندر شد&quot;;
+    }
+}
+
+// Abstract Factory
+public interface IGUIFactory
+{
+    IButton CreateButton();
+    ICheckbox CreateCheckbox();
+}
+
+// Concrete Factories
+public class WindowsFactory : IGUIFactory
+{
+    public IButton CreateButton()
+    {
+        return new WindowsButton();
+    }
+
+    public ICheckbox CreateCheckbox()
+    {
+        return new WindowsCheckbox();
+    }
+}
+
+public class MacOSFactory : IGUIFactory
+{
+    public IButton CreateButton()
+    {
+        return new MacOSButton();
+    }
+
+    public ICheckbox CreateCheckbox()
+    {
+        return new MacOSCheckbox();
+    }
+}
+</code></pre>
+<h3>مثال 2: سیستم پایگاه داده</h3>
+<pre><code class="language-csharp">// Abstract Products
+public interface IConnection
+{
+    string Connect();
+}
+
+public interface IQuery
+{
+    string Execute();
+}
+
+// Concrete Products - MySQL
+public class MySQLConnection : IConnection
+{
+    public string Connect()
+    {
+        return &quot;🔌 اتصال به MySQL برقرار شد&quot;;
+    }
+}
+
+public class MySQLQuery : IQuery
+{
+    public string Execute()
+    {
+        return &quot;✅ کوئری MySQL اجرا شد&quot;;
+    }
+}
+
+// Concrete Products - PostgreSQL
+public class PostgreSQLConnection : IConnection
+{
+    public string Connect()
+    {
+        return &quot;🔌 اتصال به PostgreSQL برقرار شد&quot;;
+    }
+}
+
+public class PostgreSQLQuery : IQuery
+{
+    public string Execute()
+    {
+        return &quot;✅ کوئری PostgreSQL اجرا شد&quot;;
+    }
+}
+
+// Abstract Factory
+public interface IDatabaseFactory
+{
+    IConnection CreateConnection();
+    IQuery CreateQuery();
+}
+
+// Concrete Factories
+public class MySQLFactory : IDatabaseFactory
+{
+    public IConnection CreateConnection()
+    {
+        return new MySQLConnection();
+    }
+
+    public IQuery CreateQuery()
+    {
+        return new MySQLQuery();
+    }
+}
+
+public class PostgreSQLFactory : IDatabaseFactory
+{
+    public IConnection CreateConnection()
+    {
+        return new PostgreSQLConnection();
+    }
+
+    public IQuery CreateQuery()
+    {
+        return new PostgreSQLQuery();
+    }
+}
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li><strong>زمانی که سیستم باید مستقل از نحوه ایجاد، ترکیب و نمایش محصولات باشد</strong></li>
+<li><strong>زمانی که سیستم باید با چندین خانواده از محصولات پیکربندی شود</strong></li>
+<li><strong>زمانی که می‌خواهید خانواده‌ای از محصولات مرتبط را ارائه دهید و می‌خواهید اطمینان حاصل کنید که فقط با هم استفاده می‌شوند</strong></li>
+<li><strong>زمانی که می‌خواهید کتابخانه‌ای از محصولات را ارائه دهید و فقط می‌خواهید رابط‌های آن‌ها را نشان دهید نه پیاده‌سازی‌ها</strong></li>
+</ol>
+<h2>📚 ارتباط با الگوهای دیگر</h2>
+<ul>
+<li><strong>Abstract Factory</strong> معمولاً با <strong>Factory Method</strong> پیاده‌سازی می‌شود، اما می‌تواند با <strong>Prototype</strong> هم پیاده‌سازی شود</li>
+<li><strong>Abstract Factory</strong> می‌تواند به عنوان جایگزینی برای <strong>Facade</strong> عمل کند</li>
+<li><strong>Abstract Factory</strong> می‌تواند با <strong>Bridge</strong> استفاده شود</li>
+<li><strong>Abstract Factory</strong>، <strong>Builder</strong> و <strong>Prototype</strong> همگی می‌توانند با <strong>Singleton</strong> پیاده‌سازی شوند</li>
+</ul>
+<h2>🎓 نکات پیاده‌سازی</h2>
+<ol>
+<li>محصولات را به عنوان رابط‌های جداگانه نگاشت کنید</li>
+<li>کارخانه‌های مشخص برای هر نوع محصول ایجاد کنید</li>
+<li>کد کلاینت فقط با رابط‌های انتزاعی کار کند</li>
+<li>در نظر بگیرید از Singleton برای کارخانه‌ها استفاده کنید</li>
+<li>از نام‌گذاری مناسب برای وضوح استفاده کنید</li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Abstract Factory تضمین می‌کند که محصولاتی که با هم کار می‌کنند، با هم ایجاد شوند! 🎨</p>
+</blockquote>

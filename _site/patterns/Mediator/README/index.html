@@ -1,0 +1,283 @@
+<h1>🤝 الگوی Mediator (میانجی / واسط)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی <strong>Mediator</strong> یک الگوی طراحی رفتاری (Behavioral) است که <strong>وابستگی‌های پیچیده و آشفته بین اشیاء را کاهش می‌دهد</strong>. این الگو ارتباطات مستقیم بین اشیاء را محدود کرده و آن‌ها را مجبور می‌کند که <strong>فقط از طریق یک شیء میانجی</strong> با یکدیگر همکاری کنند.</p>
+<p>به زبان ساده‌تر، Mediator مانند یک <strong>میانجی</strong> یا <strong>هماهنگ‌کننده مرکزی</strong> عمل می‌کند که تمام ارتباطات بین اشیاء را از طریق خود مدیریت می‌کند، به جای اینکه اشیاء مستقیماً با هم ارتباط برقرار کنند.</p>
+<h2>🤔 مشکل</h2>
+<p>در برنامه‌هایی که اجزای متعددی با هم تعامل دارند، اگر هر جزء مستقیماً با اجزای دیگر ارتباط برقرار کند، مشکلات زیر پیش می‌آید:</p>
+<h3>مثال واقعی: فرم ثبت‌نام</h3>
+<p>تصور کنید یک فرم ثبت‌نام دارید با این المان‌ها:</p>
+<ul>
+<li><strong>TextBox</strong> (نام کاربری، رمز عبور، ایمیل)</li>
+<li><strong>Checkbox</strong> (قوانین را می‌پذیرم)</li>
+<li><strong>Button</strong> (ثبت‌نام)</li>
+<li><strong>Label</strong> (پیام‌های خطا/موفقیت)</li>
+</ul>
+<p>اگر بدون Mediator عمل کنید:</p>
+<ul>
+<li>Button باید به TextBox ها رجوع کند تا مقادیر را بگیرد</li>
+<li>Button باید Checkbox را چک کند</li>
+<li>Button باید Label را آپدیت کند</li>
+<li>TextBox باید Button را غیرفعال/فعال کند</li>
+<li>Checkbox باید Button را کنترل کند</li>
+</ul>
+<p><strong>نتیجه</strong>: هر المان به المان‌های دیگر وابسته است = <strong>Spaghetti Code</strong> 🍝</p>
+<h3>مشکلات بدون Mediator:</h3>
+<ol>
+<li><strong>Tight Coupling (وابستگی سخت)</strong>: هر شیء به چندین شیء دیگر وابسته است</li>
+<li><strong>پیچیدگی بالا</strong>: تغییر یک شیء نیاز به تغییر شیءهای دیگر دارد</li>
+<li><strong>استفاده مجدد سخت</strong>: نمی‌توان یک جزء را جدا از بقیه استفاده کرد</li>
+<li><strong>نگهداری دشوار</strong>: ردیابی و رفع باگ سخت است</li>
+</ol>
+<h2>💡 راه‌حل</h2>
+<p>الگوی Mediator این مشکل را با <strong>متمرکز کردن تمام ارتباطات</strong> در یک شیء میانجی حل می‌کند:</p>
+<ul>
+<li>اشیاء دیگر را نمی‌شناسند، فقط میانجی را می‌شناسند</li>
+<li>تمام درخواست‌ها از طریق میانجی ارسال می‌شود</li>
+<li>میانجی تصمیم می‌گیرد کدام شیء باید پاسخ دهد</li>
+<li><strong>Loose Coupling</strong>: اشیاء به هم وابسته نیستند</li>
+</ul>
+<h2>💻 پیاده‌سازی با C#</h2>
+<h3>مثال: سیستم چت گروهی</h3>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+// رابط میانجی - Mediator Interface
+public interface IChatMediator
+{
+    void SendMessage(string message, User sender);
+    void AddUser(User user);
+}
+
+// میانجی مشخص - Concrete Mediator
+public class ChatRoom : IChatMediator
+{
+    private readonly List&lt;User&gt; _users = new();
+
+    public void AddUser(User user)
+    {
+        _users.Add(user);
+        Console.WriteLine($&quot;✅ {user.Name} به اتاق گفتگو پیوست&quot;);
+    }
+
+    // میانجی تمام پیام‌ها را مدیریت می‌کند
+    public void SendMessage(string message, User sender)
+    {
+        foreach (var user in _users)
+        {
+            // پیام را به همه به جز فرستنده ارسال کن
+            if (user != sender)
+            {
+                user.Receive(message, sender.Name);
+            }
+        }
+    }
+}
+
+// کامپوننت - Colleague
+public class User
+{
+    public string Name { get; }
+    private readonly IChatMediator _mediator;
+
+    public User(string name, IChatMediator mediator)
+    {
+        Name = name;
+        _mediator = mediator;
+    }
+
+    // ارسال پیام از طریق میانجی (نه مستقیم به کاربران دیگر)
+    public void Send(string message)
+    {
+        Console.WriteLine($&quot;💬 {Name} می‌گوید: {message}&quot;);
+        _mediator.SendMessage(message, this);
+    }
+
+    // دریافت پیام از میانجی
+    public void Receive(string message, string senderName)
+    {
+        Console.WriteLine($&quot;   📨 {Name} دریافت کرد: {message}&quot;);
+    }
+}
+
+// استفاده
+class Program
+{
+    static void Main()
+    {
+        // ایجاد میانجی (اتاق چت)
+        var chatRoom = new ChatRoom();
+
+        // ایجاد کاربران
+        var ali = new User(&quot;علی&quot;, chatRoom);
+        var reza = new User(&quot;رضا&quot;, chatRoom);
+        var sara = new User(&quot;سارا&quot;, chatRoom);
+
+        // اضافه کردن کاربران به اتاق
+        chatRoom.AddUser(ali);
+        chatRoom.AddUser(reza);
+        chatRoom.AddUser(sara);
+
+        Console.WriteLine(&quot;\n💬 شروع مکالمه:\n&quot;);
+        
+        // ارسال پیام‌ها - هر کاربر فقط با میانجی صحبت می‌کند
+        ali.Send(&quot;سلام به همه!&quot;);
+        Console.WriteLine();
+        
+        reza.Send(&quot;سلام علی! حالت چطوره؟&quot;);
+        Console.WriteLine();
+        
+        sara.Send(&quot;درود بر همگی! چه خبر؟&quot;);
+    }
+}
+</code></pre>
+<p><strong>خروجی:</strong></p>
+<pre><code>✅ علی به اتاق گفتگو پیوست
+✅ رضا به اتاق گفتگو پیوست
+✅ سارا به اتاق گفتگو پیوست
+
+💬 شروع مکالمه:
+
+💬 علی می‌گوید: سلام به همه!
+   📨 رضا دریافت کرد: سلام به همه!
+   📨 سارا دریافت کرد: سلام به همه!
+
+💬 رضا می‌گوید: سلام علی! حالت چطوره؟
+   📨 علی دریافت کرد: سلام علی! حالت چطوره؟
+   📨 سارا دریافت کرد: سلام علی! حالت چطوره؟
+
+💬 سارا می‌گوید: درود بر همگی! چه خبر؟
+   📨 علی دریافت کرد: درود بر همگی! چه خبر؟
+   📨 رضا دریافت کرد: درود بر همگی! چه خبر؟
+</code></pre>
+<h2>🎯 مثال کاربردی: کنترل ترافیک هوایی</h2>
+<pre><code class="language-csharp">// Mediator Interface
+public interface IControlTower
+{
+    void RegisterAircraft(Aircraft aircraft);
+    void RequestLanding(Aircraft aircraft);
+    void RequestTakeoff(Aircraft aircraft);
+}
+
+// Concrete Mediator
+public class ControlTower : IControlTower
+{
+    private readonly List&lt;Aircraft&gt; _aircrafts = new();
+    private bool _runwayBusy = false;
+
+    public void RegisterAircraft(Aircraft aircraft)
+    {
+        _aircrafts.Add(aircraft);
+        Console.WriteLine($&quot;✈️ {aircraft.Name} ثبت شد&quot;);
+    }
+
+    public void RequestLanding(Aircraft aircraft)
+    {
+        if (!_runwayBusy)
+        {
+            _runwayBusy = true;
+            Console.WriteLine($&quot;✅ {aircraft.Name}: مجوز فرود دارید&quot;);
+            _runwayBusy = false;
+        }
+        else
+        {
+            Console.WriteLine($&quot;⏸️ {aircraft.Name}: منتظر بمانید، باند اشغال است&quot;);
+        }
+    }
+
+    public void RequestTakeoff(Aircraft aircraft)
+    {
+        if (!_runwayBusy)
+        {
+            _runwayBusy = true;
+            Console.WriteLine($&quot;✅ {aircraft.Name}: مجوز پرواز دارید&quot;);
+            _runwayBusy = false;
+        }
+        else
+        {
+            Console.WriteLine($&quot;⏸️ {aircraft.Name}: منتظر بمانید، باند اشغال است&quot;);
+        }
+    }
+}
+
+// Colleague
+public class Aircraft
+{
+    public string Name { get; }
+    private readonly IControlTower _controlTower;
+
+    public Aircraft(string name, IControlTower controlTower)
+    {
+        Name = name;
+        _controlTower = controlTower;
+    }
+
+    public void RequestLanding() =&gt; _controlTower.RequestLanding(this);
+    public void RequestTakeoff() =&gt; _controlTower.RequestTakeoff(this);
+}
+
+// استفاده
+var tower = new ControlTower();
+
+var flight1 = new Aircraft(&quot;پرواز IR101&quot;, tower);
+var flight2 = new Aircraft(&quot;پرواز IR202&quot;, tower);
+
+tower.RegisterAircraft(flight1);
+tower.RegisterAircraft(flight2);
+
+flight1.RequestLanding();
+flight2.RequestTakeoff();
+</code></pre>
+<h2>⚖️ مزایا و معایب</h2>
+<h3>مزایا ✅</h3>
+<ol>
+<li><strong>کاهش وابستگی (Loose Coupling)</strong>: اجزا به هم وابسته نیستند، فقط به میانجی</li>
+<li><strong>اصل تک مسئولیتی</strong>: ارتباطات در یک مکان متمرکز می‌شود</li>
+<li><strong>اصل باز/بسته</strong>: می‌توان اجزای جدید بدون تغییر اجزای موجود اضافه کرد</li>
+<li><strong>استفاده مجدد آسان‌تر</strong>: هر جزء می‌تواند مستقل استفاده شود</li>
+<li><strong>سادگی ارتباطات</strong>: منطق ارتباطی پیچیده در میانجی کپسوله می‌شود</li>
+</ol>
+<h3>معایب ❌</h3>
+<ol>
+<li><strong>God Object</strong>: میانجی ممکن است خیلی پیچیده و بزرگ شود</li>
+<li><strong>یک نقطه شکست (Single Point of Failure)</strong>: اگر میانجی خراب شود، همه چیز خراب می‌شود</li>
+<li><strong>پیچیدگی اضافی</strong>: برای سیستم‌های ساده، ممکن است بیش از حد پیچیده باشد</li>
+</ol>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<h3>✅ استفاده کنید وقتی:</h3>
+<ol>
+<li><strong>ارتباطات پیچیده</strong>: اجزا به صورت پیچیده و آشفته با هم ارتباط دارند</li>
+<li><strong>وابستگی‌های زیاد</strong>: تغییر یک کلاس نیاز به تغییر کلاس‌های زیادی دارد</li>
+<li><strong>استفاده مجدد سخت</strong>: نمی‌توانید یک جزء را بدون اجزای دیگر استفاده کنید</li>
+<li><strong>منطق ارتباطی پراکنده</strong>: logic ارتباطی در همه جا پراکنده است</li>
+</ol>
+<h3>❌ استفاده نکنید وقتی:</h3>
+<ol>
+<li><strong>ارتباطات ساده</strong>: فقط چند جزء با ارتباط ساده</li>
+<li><strong>بدون نیاز به متمرکزسازی</strong>: ارتباطات از قبل ساده و واضح است</li>
+</ol>
+<h2>🎯 کاربردهای واقعی</h2>
+<ol>
+<li><strong>سیستم‌های چت</strong>: مدیریت پیام‌رسانی بین کاربران</li>
+<li><strong>کنترل ترافیک هوایی</strong>: هماهنگی بین هواپیماها</li>
+<li><strong>رابط کاربری (UI)</strong>: مدیریت تعاملات بین المان‌های فرم</li>
+<li><strong>سیستم‌های توزیع‌شده</strong>: Message Broker (RabbitMQ, Kafka)</li>
+<li><strong>بازی‌ها</strong>: مدیریت تعاملات بین شخصیت‌ها و اشیاء</li>
+<li><strong>Smart Home</strong>: هماهنگی بین دستگاه‌های هوشمند</li>
+</ol>
+<h2>🔑 نکته کلیدی</h2>
+<blockquote>
+<p><strong>هشدار</strong>: مراقب باشید میانجی خیلی بزرگ نشود! اگر میانجی شما صدها خط کد دارد، احتمالاً باید آن را به چند میانجی کوچک‌تر تقسیم کنید.</p>
+<p><strong>Best Practice</strong>: از SOLID Principles پیروی کنید و میانجی را modular نگه دارید.</p>
+</blockquote>
+<h2>📚 مثال‌های دنیای واقعی</h2>
+<ul>
+<li><strong>Airport Control Tower</strong>: برج کنترل فرودگاه میانجی بین هواپیماها</li>
+<li><strong>Chat Server</strong>: سرور چت میانجی بین کاربران</li>
+<li><strong>Message Broker</strong>: RabbitMQ, Kafka میانجی بین سرویس‌ها</li>
+<li><strong>MVC Pattern</strong>: Controller میانجی بین Model و View</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Mediator ارتباطات را متمرکز می‌کند و Spaghetti Code را به کد تمیز تبدیل می‌کند! 🤝</p>
+</blockquote>
+<p><strong><a href="../index.html">🏠 بازگشت به صفحه اصلی</a></strong></p>

@@ -1,0 +1,190 @@
+<h1>الگوی Command (فرمان / دستور)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Command یک الگوی طراحی رفتاری است که یک درخواست را به عنوان یک شیء مستقل که حاوی تمام اطلاعات درخواست است، تبدیل می‌کند. این تبدیل به شما اجازه می‌دهد درخواست‌ها را پارامتری کنید، اجرای آن‌ها را به تعویق بیندازید، صف کنید و عملیات قابل بازگشت را پشتیبانی کنید.</p>
+<h2>🤔 مشکل</h2>
+<p>تصور کنید در حال کار روی یک برنامه ویرایشگر متن جدید هستید. وظیفه فعلی شما ایجاد نوار ابزار با دکمه‌هایی برای عملیات مختلف ویرایشگر است. شما یک کلاس <code>Button</code> بسیار خوب ایجاد کردید که می‌تواند برای دکمه‌های نوار ابزار و همچنین دکمه‌های عمومی در دیالوگ‌های مختلف استفاده شود.</p>
+<p>مشکل اینجاست: کد منطق تجاری را کجا قرار دهیم؟</p>
+<h2>💡 راه‌حل</h2>
+<p>طراحی نرم‌افزار خوب اغلب بر اساس اصل جداسازی نگرانی‌ها است که معمولاً منجر به تقسیم برنامه به لایه‌ها می‌شود. الگوی Command پیشنهاد می‌کند که اشیاء GUI نباید درخواست‌ها را مستقیماً ارسال کنند. به جای آن، باید تمام جزئیات درخواست را در یک کلاس فرمان جداگانه قرار دهید.</p>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+// رابط Command
+public interface ICommand
+{
+    void Execute();
+    void Undo();
+}
+
+// Receiver - دریافت‌کننده
+public class Light
+{
+    private readonly string _location;
+    private bool _isOn;
+
+    public Light(string location)
+    {
+        _location = location;
+        _isOn = false;
+    }
+
+    public void TurnOn()
+    {
+        _isOn = true;
+        Console.WriteLine($&quot;💡 چراغ {_location} روشن شد&quot;);
+    }
+
+    public void TurnOff()
+    {
+        _isOn = false;
+        Console.WriteLine($&quot;💡 چراغ {_location} خاموش شد&quot;);
+    }
+}
+
+// Concrete Command - روشن کردن چراغ
+public class LightOnCommand : ICommand
+{
+    private readonly Light _light;
+
+    public LightOnCommand(Light light)
+    {
+        _light = light;
+    }
+
+    public void Execute()
+    {
+        _light.TurnOn();
+    }
+
+    public void Undo()
+    {
+        _light.TurnOff();
+    }
+}
+
+// Concrete Command - خاموش کردن چراغ
+public class LightOffCommand : ICommand
+{
+    private readonly Light _light;
+
+    public LightOffCommand(Light light)
+    {
+        _light = light;
+    }
+
+    public void Execute()
+    {
+        _light.TurnOff();
+    }
+
+    public void Undo()
+    {
+        _light.TurnOn();
+    }
+}
+
+// Invoker - فراخواننده
+public class RemoteControl
+{
+    private readonly Stack&lt;ICommand&gt; _history = new();
+
+    public void ExecuteCommand(ICommand command)
+    {
+        command.Execute();
+        _history.Push(command);
+    }
+
+    public void UndoLast()
+    {
+        if (_history.Count &gt; 0)
+        {
+            ICommand command = _history.Pop();
+            command.Undo();
+            Console.WriteLine(&quot;↩️ عملیات قبلی لغو شد&quot;);
+        }
+        else
+        {
+            Console.WriteLine(&quot;⚠️ تاریخچه‌ای برای بازگشت وجود ندارد&quot;);
+        }
+    }
+}
+
+// استفاده از الگو
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(&quot;🎮 الگوی Command - کنترل از راه دور\n&quot;);
+
+        Light livingRoomLight = new Light(&quot;اتاق نشیمن&quot;);
+        Light bedroomLight = new Light(&quot;اتاق خواب&quot;);
+
+        LightOnCommand livingOn = new LightOnCommand(livingRoomLight);
+        LightOffCommand livingOff = new LightOffCommand(livingRoomLight);
+        LightOnCommand bedroomOn = new LightOnCommand(bedroomLight);
+
+        RemoteControl remote = new RemoteControl();
+
+        remote.ExecuteCommand(livingOn);
+        remote.ExecuteCommand(bedroomOn);
+        remote.ExecuteCommand(livingOff);
+
+        remote.UndoLast();
+        remote.UndoLast();
+    }
+}
+
+/* خروجی:
+🎮 الگوی Command - کنترل از راه دور
+
+💡 چراغ اتاق نشیمن روشن شد
+💡 چراغ اتاق خواب روشن شد
+💡 چراغ اتاق نشیمن خاموش شد
+💡 چراغ اتاق نشیمن روشن شد
+↩️ عملیات قبلی لغو شد
+💡 چراغ اتاق خواب خاموش شد
+↩️ عملیات قبلی لغو شد
+*/
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li><strong>پارامتری کردن عملیات</strong>: زمانی که می‌خواهید عملیات را پارامتری کنید</li>
+<li><strong>صف کردن</strong>: زمانی که می‌خواهید عملیات را صف کنید یا زمان‌بندی کنید</li>
+<li><strong>Undo/Redo</strong>: زمانی که می‌خواهید عملیات Undo/Redo را پیاده‌سازی کنید</li>
+<li><strong>Logging</strong>: ثبت تاریخچه عملیات برای audit trail</li>
+<li><strong>تراکنش</strong>: پشتیبانی از عملیات تراکنشی</li>
+</ol>
+<h2>✅ مزایا</h2>
+<ul>
+<li><strong>جداسازی</strong>: فراخواننده و دریافت‌کننده از هم جدا می‌شوند</li>
+<li><strong>Undo/Redo</strong>: پشتیبانی آسان از بازگشت عملیات</li>
+<li><strong>Macro Commands</strong>: امکان ترکیب چند فرمان</li>
+<li><strong>Queuing</strong>: صف کردن و زمان‌بندی فرمان‌ها</li>
+<li><strong>اصل Open/Closed</strong>: اضافه کردن فرمان‌های جدید بدون تغییر کد موجود</li>
+</ul>
+<h2>❌ معایب</h2>
+<ul>
+<li><strong>تعداد کلاس‌ها</strong>: برای هر عملیات یک کلاس فرمان جدید</li>
+<li><strong>پیچیدگی</strong>: ممکن است برای عملیات ساده، بیش از حد پیچیده باشد</li>
+</ul>
+<h2>🎯 کاربردهای واقعی</h2>
+<ol>
+<li><strong>سیستم‌های GUI</strong>: دکمه‌ها، منوها، کلیدهای میانبر</li>
+<li><strong>ویرایشگرهای متن</strong>: Undo/Redo operations</li>
+<li><strong>بازی‌ها</strong>: ذخیره و replay حرکات بازیکن</li>
+<li><strong>سیستم‌های صف</strong>: Message queues, Job schedulers</li>
+<li><strong>تراکنش‌های پایگاه داده</strong>: Rollback operations</li>
+<li><strong>Macro Recording</strong>: ضبط و اجرای توالی عملیات</li>
+</ol>
+<h2>🔑 نکات کلیدی</h2>
+<ul>
+<li><strong>Receiver vs Command</strong>: Receiver عملیات واقعی را انجام می‌دهد، Command فقط درخواست را کپسوله می‌کند</li>
+<li><strong>Invoker</strong>: نیازی به دانستن جزئیات فرمان ندارد</li>
+<li><strong>History</strong>: با نگهداری تاریخچه، می‌توان Undo/Redo پیاده‌سازی کرد</li>
+<li><strong>Macro Commands</strong>: می‌توان یک فرمان که چند فرمان دیگر را اجرا کند، ساخت</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Command درخواست‌ها را به اشیاء مستقل تبدیل می‌کند و امکانات قدرتمندی مثل Undo/Redo و Queuing را فراهم می‌آورد! 🎮</p>
+</blockquote>

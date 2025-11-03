@@ -1,0 +1,384 @@
+<h1>الگوی Chain of Responsibility (زنجیره مسئولیت)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Chain of Responsibility یک الگوی طراحی رفتاری است که به شما اجازه می‌دهد درخواست‌ها را در یک زنجیره از handler ها (دست‌گیرنده‌ها) منتقل کنید. پس از دریافت درخواست، هر handler تصمیم می‌گیرد که آن را پردازش کند یا به handler بعدی در زنجیره منتقل کند.</p>
+<h2>🤔 مشکل</h2>
+<p>تصور کنید در حال کار روی یک سیستم سفارش آنلاین هستید. می‌خواهید دسترسی به سیستم را محدود کنید تا فقط کاربران احراز هویت شده بتوانند سفارش ایجاد کنند. همچنین، کاربرانی که مجوزهای اداری دارند باید دسترسی کامل به تمام سفارش‌ها داشته باشند.</p>
+<p>بعد از کمی برنامه‌ریزی، متوجه می‌شوید که این بررسی‌ها باید به صورت ترتیبی انجام شوند. برنامه می‌تواند سعی کند کاربر را با سیستم احراز هویت کند هر بار که درخواستی حاوی اعتبارنامه کاربر دریافت می‌کند.</p>
+<h2>💡 راه‌حل</h2>
+<p>مثل بسیاری از الگوهای طراحی رفتاری دیگر، Chain of Responsibility بر تبدیل رفتارهای خاص به اشیاء مستقل به نام handlers متکی است. در مورد ما، هر بررسی باید به کلاس خودش منتقل شود که دارای یک متد واحد است که بررسی را انجام می‌دهد.</p>
+<h2>⚖️ پیامدها</h2>
+<h3>مزایا ✅</h3>
+<ul>
+<li><strong>جفت‌شدگی سست</strong>: فرستنده و گیرنده را جدا می‌کند</li>
+<li><strong>انعطاف‌پذیری</strong>: می‌توانید ترتیب handlers را تغییر دهید</li>
+<li><strong>اصل تک مسئولیتی</strong>: می‌توانید کلاس‌های عملیات را از کلاس‌های فراخوانی جدا کنید</li>
+<li><strong>اصل باز/بسته</strong>: handlers جدید بدون شکستن کد موجود</li>
+</ul>
+<h3>معایب ❌</h3>
+<ul>
+<li>برخی درخواست‌ها ممکن است بدون پردازش بمانند</li>
+<li>دیباگ زنجیره می‌تواند سخت باشد</li>
+</ul>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+namespace ChainOfResponsibilityPattern
+{
+    // کلاس درخواست برای نگهداری اطلاعات درخواست
+    public class Request
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string Role { get; set; }
+        public bool AdminRequired { get; set; }
+        public string Data { get; set; }
+
+        public Request()
+        {
+            Role = &quot;user&quot;; // مقدار پیش‌فرض
+            AdminRequired = false;
+        }
+    }
+
+    // رابط Handler - تعریف رابط مشترک برای تمام دست‌گیرنده‌ها
+    public abstract class Handler
+    {
+        // نگهداری مرجع به handler بعدی در زنجیره
+        protected Handler _nextHandler;
+
+        // تنظیم handler بعدی و بازگشت آن برای ایجاد زنجیره روان
+        public Handler SetNext(Handler handler)
+        {
+            _nextHandler = handler;
+            return handler;
+        }
+
+        // متد انتزاعی برای پردازش درخواست
+        public abstract string Handle(Request request);
+    }
+
+    // Handler احراز هویت - بررسی اعتبار کاربری
+    public class AuthenticationHandler : Handler
+    {
+        public override string Handle(Request request)
+        {
+            // بررسی وجود نام کاربری و رمز عبور
+            if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
+            {
+                return &quot;❌ خطای احراز هویت: نام کاربری یا رمز عبور وارد نشده&quot;;
+            }
+
+            // بررسی صحت رمز عبور
+            if (request.Password != &quot;secret123&quot;)
+            {
+                return &quot;❌ خطای احراز هویت: رمز عبور اشتباه است&quot;;
+            }
+
+            Console.WriteLine(&quot;✅ احراز هویت موفق&quot;);
+
+            // انتقال درخواست به handler بعدی در زنجیره
+            if (_nextHandler != null)
+            {
+                return _nextHandler.Handle(request);
+            }
+
+            return null;
+        }
+    }
+
+    // Handler مجوزدهی - بررسی سطح دسترسی کاربر
+    public class AuthorizationHandler : Handler
+    {
+        public override string Handle(Request request)
+        {
+            // بررسی نیاز به دسترسی ادمین
+            if (request.AdminRequired &amp;&amp; request.Role != &quot;admin&quot;)
+            {
+                return &quot;❌ خطای مجوز: نیاز به دسترسی ادمین&quot;;
+            }
+
+            Console.WriteLine(&quot;✅ مجوز تأیید شد&quot;);
+
+            // انتقال درخواست به handler بعدی
+            if (_nextHandler != null)
+            {
+                return _nextHandler.Handle(request);
+            }
+
+            return null;
+        }
+    }
+
+    // Handler اعتبارسنجی - بررسی صحت داده‌ها
+    public class ValidationHandler : Handler
+    {
+        public override string Handle(Request request)
+        {
+            // بررسی خالی نبودن داده
+            if (string.IsNullOrEmpty(request.Data))
+            {
+                return &quot;❌ خطای اعتبارسنجی: داده خالی است&quot;;
+            }
+
+            // بررسی طول داده
+            if (request.Data.Length &lt; 5)
+            {
+                return &quot;❌ خطای اعتبارسنجی: داده باید حداقل 5 کاراکتر باشد&quot;;
+            }
+
+            Console.WriteLine(&quot;✅ اعتبارسنجی موفق&quot;);
+
+            // انتقال درخواست به handler بعدی
+            if (_nextHandler != null)
+            {
+                return _nextHandler.Handle(request);
+            }
+
+            return null;
+        }
+    }
+
+    // Handler پردازش نهایی - پردازش درخواست معتبر
+    public class ProcessHandler : Handler
+    {
+        public override string Handle(Request request)
+        {
+            Console.WriteLine($&quot;✅ پردازش درخواست: {request.Data}&quot;);
+            return &quot;درخواست با موفقیت پردازش شد! 🎉&quot;;
+        }
+    }
+
+    // برنامه اصلی
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // تنظیم کدگذاری برای نمایش صحیح فارسی
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine(&quot;🔗 الگوی Chain of Responsibility\n&quot;);
+            Console.WriteLine(&quot;============================================================&quot;);
+
+            // ساخت زنجیره مسئولیت
+            var auth = new AuthenticationHandler();
+            var authz = new AuthorizationHandler();
+            var validation = new ValidationHandler();
+            var process = new ProcessHandler();
+
+            // اتصال handler ها به یکدیگر برای ایجاد زنجیره
+            auth.SetNext(authz).SetNext(validation).SetNext(process);
+
+            // تست 1: درخواست معتبر
+            Console.WriteLine(&quot;\n📤 تست 1: درخواست معتبر&quot;);
+            Console.WriteLine(&quot;------------------------------------------------------------&quot;);
+            var request1 = new Request
+            {
+                Username = &quot;ali&quot;,
+                Password = &quot;secret123&quot;,
+                Role = &quot;user&quot;,
+                Data = &quot;سفارش محصول&quot;
+            };
+            string result = auth.Handle(request1);
+            Console.WriteLine($&quot;📥 نتیجه: {result}&quot;);
+
+            // تست 2: رمز عبور اشتباه
+            Console.WriteLine(&quot;\n\n📤 تست 2: رمز عبور اشتباه&quot;);
+            Console.WriteLine(&quot;------------------------------------------------------------&quot;);
+            var request2 = new Request
+            {
+                Username = &quot;reza&quot;,
+                Password = &quot;wrong&quot;,
+                Data = &quot;سفارش محصول&quot;
+            };
+            result = auth.Handle(request2);
+            Console.WriteLine($&quot;📥 نتیجه: {result}&quot;);
+
+            // تست 3: نیاز به دسترسی ادمین
+            Console.WriteLine(&quot;\n\n📤 تست 3: نیاز به دسترسی ادمین&quot;);
+            Console.WriteLine(&quot;------------------------------------------------------------&quot;);
+            var request3 = new Request
+            {
+                Username = &quot;sara&quot;,
+                Password = &quot;secret123&quot;,
+                Role = &quot;user&quot;,
+                AdminRequired = true,
+                Data = &quot;حذف کاربر&quot;
+            };
+            result = auth.Handle(request3);
+            Console.WriteLine($&quot;📥 نتیجه: {result}&quot;);
+
+            // تست 4: داده نامعتبر
+            Console.WriteLine(&quot;\n\n📤 تست 4: داده نامعتبر&quot;);
+            Console.WriteLine(&quot;------------------------------------------------------------&quot;);
+            var request4 = new Request
+            {
+                Username = &quot;mehdi&quot;,
+                Password = &quot;secret123&quot;,
+                Role = &quot;user&quot;,
+                Data = &quot;کم&quot;
+            };
+            result = auth.Handle(request4);
+            Console.WriteLine($&quot;📥 نتیجه: {result}&quot;);
+
+            Console.WriteLine(&quot;\n\nبرای خروج کلیدی را فشار دهید...&quot;);
+            Console.ReadKey();
+        }
+    }
+}
+</code></pre>
+<h3>📤 خروجی برنامه:</h3>
+<pre><code>🔗 الگوی Chain of Responsibility
+
+============================================================
+
+📤 تست 1: درخواست معتبر
+------------------------------------------------------------
+✅ احراز هویت موفق
+✅ مجوز تأیید شد
+✅ اعتبارسنجی موفق
+✅ پردازش درخواست: سفارش محصول
+📥 نتیجه: درخواست با موفقیت پردازش شد! 🎉
+
+
+📤 تست 2: رمز عبور اشتباه
+------------------------------------------------------------
+📥 نتیجه: ❌ خطای احراز هویت: رمز عبور اشتباه است
+
+
+📤 تست 3: نیاز به دسترسی ادمین
+------------------------------------------------------------
+✅ احراز هویت موفق
+📥 نتیجه: ❌ خطای مجوز: نیاز به دسترسی ادمین
+
+
+📤 تست 4: داده نامعتبر
+------------------------------------------------------------
+✅ احراز هویت موفق
+✅ مجوز تأیید شد
+📥 نتیجه: ❌ خطای اعتبارسنجی: داده باید حداقل 5 کاراکتر باشد
+
+برای خروج کلیدی را فشار دهید...
+</code></pre>
+<h2>🎯 مثال کاربردی واقعی</h2>
+<h3>مثال 1: سیستم پشتیبانی مشتری</h3>
+<pre><code class="language-csharp">// کلاس درخواست پشتیبانی
+public class SupportRequest
+{
+    public string Priority { get; set; }  // low, medium, high
+    public string Issue { get; set; }
+}
+
+// کلاس پایه برای پشتیبانی
+public abstract class SupportHandler : Handler
+{
+    public abstract string Handle(SupportRequest request);
+}
+
+// پشتیبانی سطح 1 - مسائل ساده
+public class Level1Support : Handler
+{
+    public override string Handle(Request request)
+    {
+        var supportRequest = request as SupportRequest;
+        if (supportRequest?.Priority == &quot;low&quot;)
+        {
+            return $&quot;✅ پشتیبانی سطح 1: {supportRequest.Issue} حل شد&quot;;
+        }
+        
+        Console.WriteLine(&quot;🔄 انتقال به سطح 2...&quot;);
+        return _nextHandler?.Handle(request);
+    }
+}
+
+// پشتیبانی سطح 2 - مسائل متوسط
+public class Level2Support : Handler
+{
+    public override string Handle(Request request)
+    {
+        var supportRequest = request as SupportRequest;
+        if (supportRequest?.Priority == &quot;medium&quot;)
+        {
+            return $&quot;✅ پشتیبانی سطح 2: {supportRequest.Issue} حل شد&quot;;
+        }
+        
+        Console.WriteLine(&quot;🔄 انتقال به مدیر...&quot;);
+        return _nextHandler?.Handle(request);
+    }
+}
+
+// پشتیبانی مدیریتی - مسائل بحرانی
+public class ManagerSupport : Handler
+{
+    public override string Handle(Request request)
+    {
+        var supportRequest = request as SupportRequest;
+        return $&quot;✅ مدیر: {supportRequest.Issue} حل شد (اولویت بالا)&quot;;
+    }
+}
+</code></pre>
+<h3>مثال 2: سیستم لاگ</h3>
+<pre><code class="language-csharp">// کلاس درخواست لاگ
+public class LogRequest
+{
+    public string Level { get; set; }     // INFO, DEBUG, WARNING, ERROR, CRITICAL
+    public string Message { get; set; }
+}
+
+// لاگر کنسول - نمایش پیام‌های INFO و DEBUG
+public class ConsoleLogger : Handler
+{
+    public override string Handle(Request request)
+    {
+        var logRequest = request as LogRequest;
+        if (logRequest != null &amp;&amp; 
+            (logRequest.Level == &quot;INFO&quot; || logRequest.Level == &quot;DEBUG&quot;))
+        {
+            Console.WriteLine($&quot;📺 Console: {logRequest.Message}&quot;);
+        }
+        
+        return _nextHandler?.Handle(request);
+    }
+}
+
+// لاگر فایل - ذخیره هشدارها و خطاها
+public class FileLogger : Handler
+{
+    public override string Handle(Request request)
+    {
+        var logRequest = request as LogRequest;
+        if (logRequest != null &amp;&amp; 
+            (logRequest.Level == &quot;WARNING&quot; || logRequest.Level == &quot;ERROR&quot;))
+        {
+            Console.WriteLine($&quot;📁 File: {logRequest.Message}&quot;);
+        }
+        
+        return _nextHandler?.Handle(request);
+    }
+}
+
+// لاگر ایمیل - ارسال خطاهای بحرانی
+public class EmailLogger : Handler
+{
+    public override string Handle(Request request)
+    {
+        var logRequest = request as LogRequest;
+        if (logRequest != null &amp;&amp; logRequest.Level == &quot;CRITICAL&quot;)
+        {
+            Console.WriteLine($&quot;📧 Email: {logRequest.Message}&quot;);
+        }
+        
+        return _nextHandler?.Handle(request);
+    }
+}
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li><strong>زمانی که برنامه باید انواع مختلف درخواست‌ها را به روش‌های مختلف پردازش کند</strong></li>
+<li><strong>زمانی که ترتیب handlers مهم است</strong></li>
+<li><strong>زمانی که مجموعه handlers و ترتیب آن‌ها باید در زمان اجرا تغییر کند</strong></li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Chain of Responsibility درخواست را در زنجیره منتقل می‌کند تا handler مناسب آن را پردازش کند! 🔗</p>
+</blockquote>

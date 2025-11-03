@@ -1,0 +1,120 @@
+<h1>🧬 الگوی نمونه اولیه (Prototype)</h1>
+<h2>🎯 هدف</h2>
+<p><strong>کپی کردن اشیاء موجود بدون وابستگی به کلاس‌های آن‌ها</strong></p>
+<h2>🤔 مشکل</h2>
+<p>ساخت یک کپی دقیق از شیء سخت است، به خصوص اگر فیلدهای private داشته باشد یا ساخت اولیه پرهزینه باشد.</p>
+<h2>💡 راه‌حل</h2>
+<p>Prototype فرآیند کلون را به خود اشیاء واگذار می‌کند. رابط مشترکی برای کلون تعریف می‌کنید.</p>
+<h2>💻 پیاده‌سازی با C#</h2>
+<pre><code class="language-csharp">// Prototype Interface
+public interface IShape
+{
+    IShape Clone();
+    string Draw();
+}
+
+// Concrete Prototypes
+public class Circle : IShape
+{
+    public int Radius { get; set; }
+    public string Color { get; set; }
+
+    public Circle(int radius, string color)
+    {
+        Radius = radius;
+        Color = color;
+        Console.WriteLine($&quot;⚙️ ساخت دایره جدید (پرهزینه!)&quot;);
+    }
+
+    // Copy Constructor
+    private Circle(Circle source)
+    {
+        Radius = source.Radius;
+        Color = source.Color;
+        Console.WriteLine($&quot;📋 کلون دایره (سریع!)&quot;);
+    }
+
+    public IShape Clone()
+    {
+        return new Circle(this);
+    }
+
+    public string Draw()
+    {
+        return $&quot;⭕ دایره {Color} با شعاع {Radius}&quot;;
+    }
+}
+
+public class Rectangle : IShape
+{
+    public int Width { get; set; }
+    public int Height { get; set; }
+    public string Color { get; set; }
+
+    public Rectangle(int width, int height, string color)
+    {
+        Width = width;
+        Height = height;
+        Color = color;
+    }
+
+    private Rectangle(Rectangle source)
+    {
+        Width = source.Width;
+        Height = source.Height;
+        Color = source.Color;
+    }
+
+    public IShape Clone()
+    {
+        return new Rectangle(this);
+    }
+
+    public string Draw()
+    {
+        return $&quot;▭ مستطیل {Color} {Width}x{Height}&quot;;
+    }
+}
+</code></pre>
+<h2>🎯 مثال کاربردی</h2>
+<pre><code class="language-csharp">// استفاده
+var originalCircle = new Circle(10, &quot;قرمز&quot;);
+Console.WriteLine(originalCircle.Draw());
+
+// کلون کردن سریع
+var clonedCircle = (Circle)originalCircle.Clone();
+clonedCircle.Radius = 20;
+clonedCircle.Color = &quot;آبی&quot;;
+
+Console.WriteLine(originalCircle.Draw());
+Console.WriteLine(clonedCircle.Draw());
+
+// خروجی:
+// ⚙️ ساخت دایره جدید (پرهزینه!)
+// ⭕ دایره قرمز با شعاع 10
+// 📋 کلون دایره (سریع!)
+// ⭕ دایره قرمز با شعاع 10
+// ⭕ دایره آبی با شعاع 20
+</code></pre>
+<h2>⚖️ مزایا و معایب</h2>
+<h3>مزایا ✅</h3>
+<ul>
+<li>کلون کردن سریع‌تر از ساخت جدید است</li>
+<li>از کد تکراری جلوگیری می‌کند</li>
+<li>از ساخت زیرکلاس‌های متعدد جلوگیری می‌کند</li>
+<li>اشیاء پیچیده را راحت‌تر می‌سازد</li>
+</ul>
+<h3>معایب ❌</h3>
+<ul>
+<li>کلون کردن اشیاء با referenceهای circular سخت است</li>
+<li>پیاده‌سازی Clone برای کلاس‌های پیچیده دشوار است</li>
+</ul>
+<h2>🔍 چه زمانی استفاده کنیم?</h2>
+<p>✅ کد نباید به کلاس‌های مشخص اشیاء وابسته باشد
+✅ ساخت شیء جدید گران است (IO، DB، network)
+✅ تعداد زیرکلاس‌ها را می‌خواهید کاهش دهید</p>
+<hr>
+<blockquote>
+<p><strong>💡 یادآوری</strong>: این الگو به شما کمک می‌کند کد با کیفیت‌تر و قابل نگهداری‌تر بنویسید!</p>
+</blockquote>
+<p><strong><a href="../index.html">🏠 بازگشت به صفحه اصلی</a></strong></p>

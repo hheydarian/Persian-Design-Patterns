@@ -1,0 +1,220 @@
+<h1>👑 الگوی تک‌نمونه (Singleton)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی <strong>Singleton</strong> یک الگوی طراحی سازنده (Creational) است که <strong>تضمین می‌کند یک کلاس تنها یک نمونه (instance) داشته باشد</strong> و یک نقطه دسترسی سراسری (global access point) به آن نمونه فراهم می‌کند.</p>
+<p>به عبارت دیگر، این الگو اطمینان می‌دهد که از یک کلاس فقط یک شیء در کل برنامه ایجاد شود و همه بخش‌های برنامه از همان یک نمونه استفاده کنند.</p>
+<h2>🤔 مشکل</h2>
+<p>در برنامه‌نویسی، گاهی اوقات نیاز داریم که از یک کلاس خاص <strong>فقط یک نمونه</strong> در کل برنامه وجود داشته باشد. به عنوان مثال:</p>
+<ul>
+<li><strong>مدیر پیکربندی (Configuration Manager)</strong>: تنظیمات برنامه باید در یک جا ذخیره و مدیریت شوند</li>
+<li><strong>Logger (ثبت‌کننده رویدادها)</strong>: تمام log‌ها باید در یک فایل یا سیستم واحد ثبت شوند</li>
+<li><strong>Connection Pool</strong>: مدیریت متمرکز اتصالات به پایگاه داده</li>
+<li><strong>Driver Manager</strong>: مدیریت درایورهای سخت‌افزاری</li>
+<li><strong>Cache Manager</strong>: مدیریت کش داده‌ها در حافظه</li>
+</ul>
+<p>اگر بدون Singleton عمل کنیم، ممکن است چندین نمونه از این کلاس‌ها ایجاد شود که منجر به:</p>
+<ul>
+<li><strong>مصرف بیشتر منابع</strong> (حافظه، فایل‌ها، اتصالات)</li>
+<li><strong>عدم هماهنگی داده‌ها</strong> (هر نمونه داده‌های متفاوتی دارد)</li>
+<li><strong>پیچیدگی در مدیریت</strong> (نمی‌دانیم کدام نمونه را استفاده کنیم)</li>
+</ul>
+<p><strong>مثال واقعی</strong>: فرض کنید در برنامه شما یک کلاس <code>DatabaseConnection</code> دارید. اگر هر بار که نیاز به دسترسی به دیتابیس دارید یک نمونه جدید بسازید، ممکن است صدها اتصال باز به دیتابیس داشته باشید که منابع سرور را به اتمام می‌رساند!</p>
+<h2>💡 راه‌حل</h2>
+<p>الگوی Singleton این مشکل را با دو قدم حل می‌کند:</p>
+<ol>
+<li><strong>سازنده (Constructor) را private کنید</strong>: تا کسی نتواند با <code>new</code> مستقیماً شیء بسازد</li>
+<li><strong>یک متد static عمومی ایجاد کنید</strong>: که به عنوان سازنده عمل می‌کند و نمونه واحد را برمی‌گرداند</li>
+</ol>
+<p>این متد در اولین فراخوانی، شیء را می‌سازد و در فراخوانی‌های بعدی همان شیء را برمی‌گرداند.</p>
+<h2>📊 ساختار</h2>
+<pre><code class="language-mermaid">classDiagram
+    class Singleton {
+        static Singleton instance 🔒
+        Singleton() 🔒
+        static GetInstance() Singleton ✨
+        BusinessLogic() 📋
+    }
+    
+    class Client1 {
+        UseService() 👤
+    }
+    
+    class Client2 {
+        UseService() 👥
+    }
+    
+    Client1 --&gt; Singleton : همیشه همان نمونه را دریافت می‌کند
+    Client2 --&gt; Singleton : همیشه همان نمونه را دریافت می‌کند
+    
+    note for Singleton &quot;تنها یک نمونه در کل برنامه ✅&quot;
+</code></pre>
+<h2>💻 پیاده‌سازی با C#</h2>
+<h3>روش اول: Thread-Safe با Double-Check Locking</h3>
+<pre><code class="language-csharp">public sealed class ConfigurationManager
+{
+    private static ConfigurationManager _instance;
+    private static readonly object _lock = new object();
+
+    public Dictionary&lt;string, string&gt; Settings { get; }
+
+    // سازنده private - کسی نمی‌تواند مستقیماً شیء بسازد
+    private ConfigurationManager()
+    {
+        Settings = new Dictionary&lt;string, string&gt;
+        {
+            { &quot;AppName&quot;, &quot;MyApp&quot; },
+            { &quot;Version&quot;, &quot;1.0&quot; },
+            { &quot;Database&quot;, &quot;SQL Server&quot; }
+        };
+    }
+
+    // متد استاتیک برای دریافت نمونه واحد
+    public static ConfigurationManager Instance
+    {
+        get
+        {
+            // بررسی اول: بدون lock برای بهبود کارایی
+            if (_instance == null)
+            {
+                lock (_lock) // قفل برای thread-safety
+                {
+                    // بررسی دوم: درون lock
+                    if (_instance == null)
+                    {
+                        _instance = new ConfigurationManager();
+                    }
+                }
+            }
+            return _instance;
+        }
+    }
+
+    public string GetSetting(string key) =&gt; 
+        Settings.TryGetValue(key, out var value) ? value : &quot;Not Found&quot;;
+}
+
+// استفاده
+class Program
+{
+    static void Main()
+    {
+        // هر دو متغیر به همان نمونه اشاره می‌کنند
+        var config1 = ConfigurationManager.Instance;
+        var config2 = ConfigurationManager.Instance;
+
+        Console.WriteLine($&quot;آیا یکسان هستند؟ {config1 == config2}&quot;); // True
+        Console.WriteLine($&quot;نام برنامه: {config1.GetSetting(&quot;AppName&quot;)}&quot;); // MyApp
+        Console.WriteLine($&quot;پایگاه داده: {config2.GetSetting(&quot;Database&quot;)}&quot;); // SQL Server
+    }
+}
+</code></pre>
+<h3>روش دوم: Lazy Initialization (ساده‌تر و امن‌تر)</h3>
+<pre><code class="language-csharp">public sealed class Logger
+{
+    // Lazy&lt;T&gt; خود thread-safe است
+    private static readonly Lazy&lt;Logger&gt; _instance = 
+        new Lazy&lt;Logger&gt;(() =&gt; new Logger());
+
+    private Logger()
+    {
+        Console.WriteLine(&quot;✅ Logger ایجاد شد&quot;);
+    }
+
+    public static Logger Instance =&gt; _instance.Value;
+
+    public void Log(string message) =&gt; 
+        Console.WriteLine($&quot;📝 [{DateTime.Now:HH:mm:ss}] {message}&quot;);
+}
+
+// استفاده
+Logger.Instance.Log(&quot;برنامه شروع شد&quot;);
+Logger.Instance.Log(&quot;عملیات انجام شد&quot;);
+</code></pre>
+<h2>🎯 مثال واقعی: سیستم Cache</h2>
+<pre><code class="language-csharp">public sealed class CacheManager
+{
+    private static readonly Lazy&lt;CacheManager&gt; _instance = 
+        new Lazy&lt;CacheManager&gt;(() =&gt; new CacheManager());
+    
+    private readonly Dictionary&lt;string, object&gt; _cache = new();
+
+    private CacheManager() { }
+
+    public static CacheManager Instance =&gt; _instance.Value;
+
+    public void Set(string key, object value) =&gt; _cache[key] = value;
+    
+    public T Get&lt;T&gt;(string key) =&gt; 
+        _cache.TryGetValue(key, out var value) ? (T)value : default;
+
+    public bool Exists(string key) =&gt; _cache.ContainsKey(key);
+}
+
+// استفاده
+CacheManager.Instance.Set(&quot;user:1&quot;, new { Name = &quot;علی&quot;, Age = 25 });
+var user = CacheManager.Instance.Get&lt;dynamic&gt;(&quot;user:1&quot;);
+Console.WriteLine($&quot;نام: {user.Name}&quot;); // علی
+</code></pre>
+<h2>⚖️ مزایا و معایب</h2>
+<h3>مزایا ✅</h3>
+<ol>
+<li><strong>کنترل دسترسی به نمونه واحد</strong>: تضمین می‌کند فقط یک نمونه وجود دارد</li>
+<li><strong>دسترسی سراسری</strong>: از هر نقطه از برنامه قابل دسترسی است</li>
+<li><strong>مقداردهی تنبل (Lazy Initialization)</strong>: نمونه فقط زمانی ساخته می‌شود که نیاز باشد</li>
+<li><strong>صرفه‌جویی در منابع</strong>: از ایجاد نمونه‌های اضافی جلوگیری می‌کند</li>
+<li><strong>مدیریت متمرکز</strong>: تمام عملیات از یک نقطه مدیریت می‌شوند</li>
+<li><strong>Thread-Safe</strong>: با پیاده‌سازی صحیح، در محیط‌های چندنخی امن است</li>
+</ol>
+<h3>معایب ❌</h3>
+<ol>
+<li><strong>نقض اصل تک مسئولیتی</strong>: کلاس هم مسئول منطق کسب‌وکار و هم مدیریت نمونه خود است</li>
+<li><strong>سختی در تست</strong>: Mock کردن Singleton در Unit Test دشوار است</li>
+<li><strong>وابستگی سخت (Tight Coupling)</strong>: کلاس‌های دیگر به Singleton وابسته می‌شوند</li>
+<li><strong>مشکلات چندنخی</strong>: اگر درست پیاده‌سازی نشود، می‌تواند مشکل ایجاد کند</li>
+<li><strong>پنهان کردن وابستگی‌ها</strong>: استفاده مستقیم از Instance باعث می‌شود وابستگی‌ها مشخص نباشند</li>
+<li><strong>مشکل در محیط‌های توزیع‌شده</strong>: در سیستم‌های چند سروری، هر سرور یک نمونه جداگانه دارد</li>
+</ol>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<h3>✅ استفاده کنید وقتی:</h3>
+<ol>
+<li><strong>دقیقاً یک نمونه نیاز دارید</strong>: مثل مدیر پیکربندی، مدیر اتصال، Logger</li>
+<li><strong>دسترسی سراسری لازم است</strong>: همه بخش‌های برنامه باید به یک نمونه دسترسی داشته باشند</li>
+<li><strong>کنترل دقیق روی منابع</strong>: مدیریت منابع محدود مثل Connection Pool</li>
+<li><strong>هماهنگی متمرکز</strong>: عملیاتی که باید از یک نقطه هماهنگ شوند</li>
+</ol>
+<h3>❌ استفاده نکنید وقتی:</h3>
+<ol>
+<li><strong>نیاز به چندین نمونه دارید</strong>: اگر ممکن است در آینده بیشتر از یک نمونه نیاز باشد</li>
+<li><strong>تست‌پذیری مهم است</strong>: Singleton تست واحد را سخت می‌کند</li>
+<li><strong>می‌توان از Dependency Injection استفاده کرد</strong>: DI راه‌حل بهتری است</li>
+<li><strong>State قابل تغییر دارید</strong>: اگر وضعیت تغییر می‌کند، مشکلات concurrency ایجاد می‌شود</li>
+</ol>
+<h2>🎯 کاربردهای واقعی</h2>
+<ol>
+<li><strong>مدیریت لاگ (Logging)</strong>: یک Logger برای کل برنامه</li>
+<li><strong>مدیریت پیکربندی (Configuration)</strong>: تنظیمات برنامه</li>
+<li><strong>Cache Manager</strong>: مدیریت کش در حافظه</li>
+<li><strong>Connection Pool</strong>: مدیریت اتصالات به پایگاه داده</li>
+<li><strong>Thread Pool</strong>: مدیریت thread‌ها</li>
+<li><strong>Print Spooler</strong>: صف چاپ در سیستم‌عامل</li>
+<li><strong>Device Drivers</strong>: مدیریت سخت‌افزار</li>
+</ol>
+<h2>💡 نکات مهم پیاده‌سازی</h2>
+<ol>
+<li><strong>sealed class</strong>: از کلمه کلیدی <code>sealed</code> استفاده کنید تا از وراثت جلوگیری شود</li>
+<li><strong>private constructor</strong>: سازنده باید private باشد</li>
+<li><strong>Thread-Safety</strong>: در محیط‌های چندنخی از <code>lock</code> یا <code>Lazy&lt;T&gt;</code> استفاده کنید</li>
+<li><strong>Lazy Initialization</strong>: ترجیحاً از <code>Lazy&lt;T&gt;</code> در C# استفاده کنید (ساده‌تر و امن‌تر)</li>
+<li><strong>Eager vs Lazy</strong>:
+<ul>
+<li><strong>Eager</strong>: نمونه در زمان بارگذاری کلاس ساخته می‌شود</li>
+<li><strong>Lazy</strong>: نمونه در اولین استفاده ساخته می‌شود</li>
+</ul>
+</li>
+</ol>
+<h2>🔑 نکته کلیدی</h2>
+<blockquote>
+<p><strong>هشدار</strong>: از Singleton زیاد استفاده نکنید! این الگو یک <strong>Anti-Pattern</strong> محسوب می‌شود اگر بیش از حد استفاده شود. در برنامه‌های مدرن، <strong>Dependency Injection</strong> معمولاً گزینه بهتری است.</p>
+<p>در ASP.NET Core به جای Singleton دستی، از <code>services.AddSingleton&lt;T&gt;()</code> استفاده کنید.</p>
+</blockquote>
+<hr>
+<p><strong><a href="../index.html">🏠 بازگشت به صفحه اصلی</a></strong></p>

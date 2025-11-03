@@ -1,0 +1,413 @@
+<h1>الگوی Proxy (پروکسی / نماینده)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Proxy یک الگوی طراحی ساختاری است که به شما اجازه می‌دهد یک جایگزین یا placeholder برای یک شیء دیگر فراهم کنید. یک Proxy دسترسی به شیء اصلی را کنترل می‌کند و به شما امکان می‌دهد کاری را قبل یا بعد از رسیدن درخواست به شیء اصلی انجام دهید.</p>
+<h2>🤔 مشکل</h2>
+<p>چرا می‌خواهید دسترسی به یک شیء را کنترل کنید؟ مثال بزنیم: یک شیء بزرگ دارید که مقدار زیادی منابع سیستم مصرف می‌کند. شما گاهی به آن نیاز دارید، اما نه همیشه.</p>
+<p>می‌توانید پیاده‌سازی lazy initialization را انجام دهید: شیء را فقط زمانی ایجاد کنید که واقعاً نیاز است. اما تمام کلاینت‌های شیء باید کد اولیه‌سازی تنبل را اجرا کنند. متأسفانه، این احتمالاً باعث تکرار کد زیادی شود.</p>
+<h2>💡 راه‌حل</h2>
+<p>الگوی Proxy پیشنهاد می‌کند یک کلاس proxy جدید با همان رابط شیء سرویس اصلی ایجاد کنید. سپس برنامه خود را به‌روزرسانی می‌کنید تا شیء proxy را به تمام کلاینت‌های شیء اصلی منتقل کند. پس از دریافت درخواست از کلاینت، proxy یک شیء سرویس واقعی ایجاد می‌کند و تمام کار را به آن واگذار می‌کند.</p>
+<h2>👥 شرکت‌کنندگان</h2>
+<ol>
+<li><strong>ServiceInterface</strong>: رابط مشترک برای Service و Proxy</li>
+<li><strong>Service</strong>: کلاس سرویس واقعی</li>
+<li><strong>Proxy</strong>: نماینده‌ای که دسترسی به Service را کنترل می‌کند</li>
+<li><strong>Client</strong>: با ServiceInterface کار می‌کند</li>
+</ol>
+<h2>🔄 انواع Proxy</h2>
+<h3>1. Virtual Proxy (پروکسی مجازی)</h3>
+<p>کنترل دسترسی به منابعی که گران هستند</p>
+<h3>2. Protection Proxy (پروکسی محافظ)</h3>
+<p>کنترل دسترسی بر اساس حقوق</p>
+<h3>3. Remote Proxy (پروکسی از راه دور)</h3>
+<p>نمایش یک شیء که در فضای آدرس دیگری است</p>
+<h3>4. Caching Proxy (پروکسی حافظه نهان)</h3>
+<p>ذخیره نتایج درخواست‌ها</p>
+<h2>⚖️ پیامدها</h2>
+<h3>مزایا ✅</h3>
+<ul>
+<li><strong>کنترل دسترسی</strong>: کنترل زمان و نحوه دسترسی به شیء</li>
+<li><strong>Lazy initialization</strong>: ایجاد شیء فقط در صورت نیاز</li>
+<li><strong>Logging و Caching</strong>: افزودن قابلیت‌های اضافی بدون تغییر سرویس</li>
+<li><strong>اصل باز/بسته</strong>: می‌توانید proxies جدید معرفی کنید بدون تغییر سرویس</li>
+</ul>
+<h3>معایب ❌</h3>
+<ul>
+<li>کد ممکن است پیچیده‌تر شود</li>
+<li>پاسخ سرویس ممکن است با تأخیر همراه باشد</li>
+</ul>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+using System.Threading;
+
+// رابط سرویس - تعریف عملیات مشترک بین سرویس واقعی و پروکسی
+public interface IImage
+{
+    void Display();
+}
+
+// سرویس واقعی - کلاسی که عملیات واقعی را انجام می‌دهد
+public class RealImage : IImage
+{
+    private string _filename;
+
+    public RealImage(string filename)
+    {
+        _filename = filename;
+        LoadFromDisk();
+    }
+
+    // متد خصوصی برای بارگذاری تصویر از دیسک
+    private void LoadFromDisk()
+    {
+        Console.WriteLine($&quot;💿 بارگذاری تصویر از دیسک: {_filename}&quot;);
+        Thread.Sleep(2000); // شبیه‌سازی بارگذاری
+    }
+
+    public void Display()
+    {
+        Console.WriteLine($&quot;🖼️ نمایش تصویر: {_filename}&quot;);
+    }
+}
+
+// Virtual Proxy - پروکسی مجازی برای Lazy Loading
+public class ImageProxy : IImage
+{
+    private string _filename;
+    private RealImage _realImage;
+
+    public ImageProxy(string filename)
+    {
+        _filename = filename;
+        _realImage = null;
+    }
+
+    public void Display()
+    {
+        // ایجاد شیء واقعی فقط در صورت نیاز (Lazy Initialization)
+        if (_realImage == null)
+        {
+            Console.WriteLine(&quot;⏳ تصویر هنوز بارگذاری نشده، در حال بارگذاری...&quot;);
+            _realImage = new RealImage(_filename);
+        }
+        _realImage.Display();
+    }
+}
+
+// Protection Proxy - پروکسی محافظ برای کنترل دسترسی
+public class ProtectedImageProxy : IImage
+{
+    private string _filename;
+    private string _userRole;
+    private RealImage _realImage;
+
+    public ProtectedImageProxy(string filename, string userRole)
+    {
+        _filename = filename;
+        _userRole = userRole;
+        _realImage = null;
+    }
+
+    public void Display()
+    {
+        // بررسی دسترسی کاربر
+        if (_userRole != &quot;admin&quot;)
+        {
+            Console.WriteLine(&quot;🚫 دسترسی رد شد! فقط ادمین می‌تواند این تصویر را ببیند.&quot;);
+            return;
+        }
+
+        // ایجاد شیء واقعی در صورت داشتن دسترسی
+        if (_realImage == null)
+        {
+            _realImage = new RealImage(_filename);
+        }
+        _realImage.Display();
+    }
+}
+
+// Caching Proxy - پروکسی کش‌دار برای ذخیره نتایج
+public class CachingImageProxy : IImage
+{
+    private string _filename;
+    // کش استاتیک برای اشتراک بین تمام نمونه‌ها
+    private static Dictionary&lt;string, RealImage&gt; _cache = new Dictionary&lt;string, RealImage&gt;();
+
+    public CachingImageProxy(string filename)
+    {
+        _filename = filename;
+    }
+
+    public void Display()
+    {
+        // بررسی وجود تصویر در کش
+        if (_cache.ContainsKey(_filename))
+        {
+            Console.WriteLine($&quot;⚡ نمایش تصویر از کش: {_filename}&quot;);
+        }
+        else
+        {
+            Console.WriteLine($&quot;📥 بارگذاری و کش کردن تصویر: {_filename}&quot;);
+            _cache[_filename] = new RealImage(_filename);
+        }
+
+        _cache[_filename].Display();
+    }
+}
+
+// کلاس اصلی برای نمایش مثال‌های استفاده
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console.WriteLine(&quot;🎭 الگوی Proxy\n&quot;);
+        Console.WriteLine(new string('=', 60));
+
+        // Virtual Proxy - بارگذاری تنبل
+        Console.WriteLine(&quot;\n1️⃣ Virtual Proxy (Lazy Loading):&quot;);
+        Console.WriteLine(new string('-', 60));
+        Console.WriteLine(&quot;ایجاد proxy...&quot;);
+        IImage image1 = new ImageProxy(&quot;photo1.jpg&quot;);
+        Console.WriteLine(&quot;Proxy ایجاد شد، اما تصویر واقعی هنوز بارگذاری نشده\n&quot;);
+
+        Console.WriteLine(&quot;اولین نمایش:&quot;);
+        image1.Display();
+
+        Console.WriteLine(&quot;\nدومین نمایش:&quot;);
+        image1.Display();
+
+        // Protection Proxy - کنترل دسترسی
+        Console.WriteLine(&quot;\n\n2️⃣ Protection Proxy (Access Control):&quot;);
+        Console.WriteLine(new string('-', 60));
+
+        Console.WriteLine(&quot;کاربر عادی:&quot;);
+        IImage image2 = new ProtectedImageProxy(&quot;secret.jpg&quot;, &quot;user&quot;);
+        image2.Display();
+
+        Console.WriteLine(&quot;\nکاربر ادمین:&quot;);
+        IImage image3 = new ProtectedImageProxy(&quot;secret.jpg&quot;, &quot;admin&quot;);
+        image3.Display();
+
+        // Caching Proxy - کش کردن نتایج
+        Console.WriteLine(&quot;\n\n3️⃣ Caching Proxy:&quot;);
+        Console.WriteLine(new string('-', 60));
+
+        Console.WriteLine(&quot;اولین درخواست:&quot;);
+        IImage image4 = new CachingImageProxy(&quot;cached_photo.jpg&quot;);
+        image4.Display();
+
+        Console.WriteLine(&quot;\nدومین درخواست (از کش):&quot;);
+        IImage image5 = new CachingImageProxy(&quot;cached_photo.jpg&quot;);
+        image5.Display();
+    }
+}
+</code></pre>
+<h3>📤 خروجی برنامه:</h3>
+<pre><code>🎭 الگوی Proxy
+
+============================================================
+
+1️⃣ Virtual Proxy (Lazy Loading):
+------------------------------------------------------------
+ایجاد proxy...
+Proxy ایجاد شد، اما تصویر واقعی هنوز بارگذاری نشده
+
+اولین نمایش:
+⏳ تصویر هنوز بارگذاری نشده، در حال بارگذاری...
+💿 بارگذاری تصویر از دیسک: photo1.jpg
+🖼️ نمایش تصویر: photo1.jpg
+
+دومین نمایش:
+🖼️ نمایش تصویر: photo1.jpg
+
+
+2️⃣ Protection Proxy (Access Control):
+------------------------------------------------------------
+کاربر عادی:
+🚫 دسترسی رد شد! فقط ادمین می‌تواند این تصویر را ببیند.
+
+کاربر ادمین:
+💿 بارگذاری تصویر از دیسک: secret.jpg
+🖼️ نمایش تصویر: secret.jpg
+
+
+3️⃣ Caching Proxy:
+------------------------------------------------------------
+اولین درخواست:
+📥 بارگذاری و کش کردن تصویر: cached_photo.jpg
+💿 بارگذاری تصویر از دیسک: cached_photo.jpg
+🖼️ نمایش تصویر: cached_photo.jpg
+
+دومین درخواست (از کش):
+⚡ نمایش تصویر از کش: cached_photo.jpg
+🖼️ نمایش تصویر: cached_photo.jpg
+</code></pre>
+<h2>🎯 مثال کاربردی واقعی</h2>
+<h3>مثال 1: Proxy برای API</h3>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+using System.Threading;
+
+// رابط سرویس داده
+public interface IDataService
+{
+    Dictionary&lt;string, object&gt; GetData(int userId);
+}
+
+// سرویس واقعی که با API ارتباط برقرار می‌کند
+public class RealDataService : IDataService
+{
+    public Dictionary&lt;string, object&gt; GetData(int userId)
+    {
+        Console.WriteLine($&quot;🌐 درخواست API برای کاربر {userId}&quot;);
+        Thread.Sleep(1000); // شبیه‌سازی تأخیر شبکه
+        
+        return new Dictionary&lt;string, object&gt;
+        {
+            { &quot;id&quot;, userId },
+            { &quot;name&quot;, $&quot;کاربر {userId}&quot; }
+        };
+    }
+}
+
+// پروکسی کش‌دار برای سرویس داده
+public class CachedDataServiceProxy : IDataService
+{
+    private RealDataService _service;
+    private Dictionary&lt;int, Dictionary&lt;string, object&gt;&gt; _cache;
+
+    public CachedDataServiceProxy()
+    {
+        _service = new RealDataService();
+        _cache = new Dictionary&lt;int, Dictionary&lt;string, object&gt;&gt;();
+    }
+
+    public Dictionary&lt;string, object&gt; GetData(int userId)
+    {
+        // بررسی وجود داده در کش
+        if (_cache.ContainsKey(userId))
+        {
+            Console.WriteLine($&quot;⚡ بازگشت از کش برای کاربر {userId}&quot;);
+            return _cache[userId];
+        }
+
+        // دریافت داده از سرویس واقعی و ذخیره در کش
+        var data = _service.GetData(userId);
+        _cache[userId] = data;
+        return data;
+    }
+}
+
+// نمونه استفاده
+public class APIProxyExample
+{
+    public static void Example()
+    {
+        IDataService service = new CachedDataServiceProxy();
+        
+        Console.WriteLine(&quot;درخواست اول:&quot;);
+        var data1 = service.GetData(1);
+        Console.WriteLine($&quot;دریافت شد: ID={data1[&quot;id&quot;]}, Name={data1[&quot;name&quot;]}\n&quot;);
+        
+        Console.WriteLine(&quot;درخواست دوم (از کش):&quot;);
+        var data2 = service.GetData(1);
+        Console.WriteLine($&quot;دریافت شد: ID={data2[&quot;id&quot;]}, Name={data2[&quot;name&quot;]}&quot;);
+    }
+}
+</code></pre>
+<h3>مثال 2: Database Proxy</h3>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+// رابط دیتابیس
+public interface IDatabase
+{
+    string Query(string sql);
+}
+
+// دیتابیس واقعی
+public class RealDatabase : IDatabase
+{
+    public string Query(string sql)
+    {
+        Console.WriteLine($&quot;🗄️ اجرای کوئری: {sql}&quot;);
+        return &quot;نتیجه کوئری&quot;;
+    }
+}
+
+// پروکسی دیتابیس با قابلیت کنترل دسترسی و لاگ‌گیری
+public class DatabaseProxy : IDatabase
+{
+    private RealDatabase _database;
+    private string _userRole;
+    private List&lt;string&gt; _log;
+
+    public DatabaseProxy(string userRole)
+    {
+        _database = new RealDatabase();
+        _userRole = userRole;
+        _log = new List&lt;string&gt;();
+    }
+
+    public string Query(string sql)
+    {
+        // بررسی دسترسی برای عملیات حساس
+        string upperSql = sql.ToUpper();
+        if (upperSql.Contains(&quot;DELETE&quot;) || upperSql.Contains(&quot;DROP&quot;))
+        {
+            if (_userRole != &quot;admin&quot;)
+            {
+                Console.WriteLine(&quot;🚫 دسترسی رد شد! فقط ادمین می‌تواند داده حذف کند.&quot;);
+                return null;
+            }
+        }
+
+        // لاگ کردن کوئری
+        string timestamp = DateTime.Now.ToString(&quot;yyyy-MM-dd HH:mm:ss&quot;);
+        _log.Add($&quot;{timestamp}: {sql}&quot;);
+
+        // اجرای کوئری
+        return _database.Query(sql);
+    }
+
+    public void ShowLogs()
+    {
+        Console.WriteLine(&quot;\n📋 تاریخچه کوئری‌ها:&quot;);
+        foreach (var log in _log)
+        {
+            Console.WriteLine($&quot;  {log}&quot;);
+        }
+    }
+}
+
+// نمونه استفاده
+public class DatabaseProxyExample
+{
+    public static void Example()
+    {
+        Console.WriteLine(&quot;👤 کاربر عادی:&quot;);
+        IDatabase userDb = new DatabaseProxy(&quot;user&quot;);
+        userDb.Query(&quot;SELECT * FROM users&quot;);
+        userDb.Query(&quot;DELETE FROM users WHERE id=1&quot;);
+        
+        Console.WriteLine(&quot;\n👨‍💼 کاربر ادمین:&quot;);
+        DatabaseProxy adminDb = new DatabaseProxy(&quot;admin&quot;);
+        adminDb.Query(&quot;SELECT * FROM users&quot;);
+        adminDb.Query(&quot;DELETE FROM users WHERE id=1&quot;);
+        adminDb.ShowLogs();
+    }
+}
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li><strong>Lazy initialization</strong> (Virtual Proxy)</li>
+<li><strong>کنترل دسترسی</strong> (Protection Proxy)</li>
+<li><strong>Caching نتایج</strong></li>
+<li><strong>Logging درخواست‌ها</strong></li>
+<li><strong>شیء از راه دور</strong> (Remote Proxy)</li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Proxy یک نماینده هوشمند است که دسترسی به شیء را کنترل می‌کند! 🛡️</p>
+</blockquote>

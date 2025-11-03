@@ -1,0 +1,138 @@
+<h1>الگوی Observer (ناظر / مشاهده‌گر)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Observer یک الگوی طراحی رفتاری است که به شما اجازه می‌دهد یک مکانیسم اشتراک تعریف کنید تا اشیاء متعددی را از رویدادهایی که برای شیءای که مشاهده می‌کنند رخ می‌دهد، مطلع کنید.</p>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+// رابط Observer - ناظر
+public interface IObserver
+{
+    void Update(float temperature);
+}
+
+// کلاس Subject - موضوع (قابل مشاهده)
+public class WeatherStation
+{
+    private List&lt;IObserver&gt; _observers = new List&lt;IObserver&gt;();
+    private float _temperature;
+
+    // اضافه کردن ناظر
+    public void Attach(IObserver observer)
+    {
+        _observers.Add(observer);
+        Console.WriteLine(&quot;✅ ناظر جدید اضافه شد&quot;);
+    }
+
+    // حذف ناظر
+    public void Detach(IObserver observer)
+    {
+        _observers.Remove(observer);
+    }
+
+    // اطلاع‌رسانی به تمام ناظرها
+    private void Notify()
+    {
+        foreach (var observer in _observers)
+        {
+            observer.Update(_temperature);
+        }
+    }
+
+    // تنظیم دمای جدید و اطلاع‌رسانی
+    public void SetTemperature(float temp)
+    {
+        Console.WriteLine($&quot;🌡️ دمای جدید: {temp}°C&quot;);
+        _temperature = temp;
+        Notify();
+    }
+}
+
+// نمایشگر موبایل - یک ناظر مشخص
+public class PhoneDisplay : IObserver
+{
+    public void Update(float temperature)
+    {
+        Console.WriteLine($&quot;📱 نمایشگر موبایل: دما {temperature}°C است&quot;);
+    }
+}
+
+// نمایشگر تلویزیون - یک ناظر دیگر
+public class TVDisplay : IObserver
+{
+    public void Update(float temperature)
+    {
+        Console.WriteLine($&quot;📺 نمایشگر TV: دما {temperature}°C است&quot;);
+    }
+}
+
+// استفاده از الگو
+class Program
+{
+    static void Main()
+    {
+        WeatherStation weatherStation = new WeatherStation();
+
+        PhoneDisplay phone = new PhoneDisplay();
+        TVDisplay tv = new TVDisplay();
+
+        weatherStation.Attach(phone);
+        weatherStation.Attach(tv);
+
+        weatherStation.SetTemperature(25);
+        weatherStation.SetTemperature(30);
+    }
+}
+
+/* خروجی:
+✅ ناظر جدید اضافه شد
+✅ ناظر جدید اضافه شد
+🌡️ دمای جدید: 25°C
+📱 نمایشگر موبایل: دما 25°C است
+📺 نمایشگر TV: دما 25°C است
+🌡️ دمای جدید: 30°C
+📱 نمایشگر موبایل: دما 30°C است
+📺 نمایشگر TV: دما 30°C است
+*/
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li><strong>وابستگی یک-به-چند</strong>: زمانی که تغییر در حالت یک شیء نیاز به تغییر اشیاء متعدد دیگر دارد</li>
+<li><strong>Event Handling</strong>: برای پیاده‌سازی سیستم‌های رویداد محور</li>
+<li><strong>اشتراک موقت</strong>: زمانی که برخی اشیاء باید اشیاء دیگر را فقط برای مدت محدودی مشاهده کنند</li>
+<li><strong>Real-time Updates</strong>: سیستم‌هایی که نیاز به به‌روزرسانی خودکار دارند</li>
+</ol>
+<h2>✅ مزایا</h2>
+<ul>
+<li><strong>جداسازی (Loose Coupling)</strong>: Subject و Observer به صورت شل به هم متصل هستند</li>
+<li><strong>انعطاف‌پذیری</strong>: می‌توان به راحتی Observer های جدید اضافه یا حذف کرد</li>
+<li><strong>اصل Open/Closed</strong>: می‌توان Observer های جدید بدون تغییر کد Subject اضافه کرد</li>
+<li><strong>پشتیبانی از Broadcast</strong>: یک تغییر به همه Observer ها اطلاع داده می‌شود</li>
+</ul>
+<h2>❌ معایب</h2>
+<ul>
+<li><strong>ترتیب نامشخص</strong>: ترتیب اطلاع‌رسانی به Observer ها قابل پیش‌بینی نیست</li>
+<li><strong>نشت حافظه (Memory Leak)</strong>: اگر Observer ها به درستی حذف نشوند، می‌توانند باعث نشت حافظه شوند</li>
+<li><strong>پیچیدگی</strong>: در سیستم‌های بزرگ، ردیابی جریان داده سخت می‌شود</li>
+<li><strong>به‌روزرسانی‌های غیرضروری</strong>: ممکن است Observer هایی که نیازی به اطلاع ندارند هم آپدیت شوند</li>
+</ul>
+<h2>🎯 کاربردهای واقعی</h2>
+<ol>
+<li><strong>سیستم‌های Event Handling</strong>: مدیریت رویدادها در UI</li>
+<li><strong>MVC Pattern</strong>: ارتباط بین Model و View</li>
+<li><strong>RSS Feeds</strong>: اشتراک و دریافت اطلاعات</li>
+<li><strong>Social Media</strong>: اطلاع‌رسانی به دنبال‌کنندگان</li>
+<li><strong>IoT</strong>: سنسورها و سیستم‌های مانیتورینگ</li>
+<li><strong>Stock Market</strong>: به‌روزرسانی قیمت‌ها</li>
+</ol>
+<h2>🔑 نکات کلیدی</h2>
+<ul>
+<li>Observer همان الگوی <strong>Publish-Subscribe</strong> است</li>
+<li>در C# از event ها و delegate ها برای پیاده‌سازی استفاده می‌شود</li>
+<li>باید مراقب نشت حافظه بود (همیشه Detach کنید)</li>
+<li>می‌توان Observer های مختلفی با رفتارهای متفاوت داشت</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Observer یک سیستم اشتراک/اطلاع‌رسانی قدرتمند ایجاد می‌کند که به شما امکان می‌دهد تغییرات را به صورت خودکار به تمام اشیاء وابسته اطلاع دهید! 👁️</p>
+</blockquote>

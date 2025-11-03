@@ -1,0 +1,438 @@
+<h1>🔌 الگوی Adapter (آداپتور / تبدیل‌گر)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی <strong>Adapter</strong> یک الگوی طراحی ساختاری (Structural) است که <strong>به اشیاء با رابط‌های ناسازگار اجازه می‌دهد با هم همکاری کنند</strong>. این الگو مانند یک مترجم عمل می‌کند که بین دو سیستم با زبان‌های متفاوت ارتباط برقرار می‌کند.</p>
+<p>به زبان ساده‌تر، Adapter مانند <strong>تبدیل برق</strong> است! وقتی می‌خواهید دستگاه ایرانی (220 ولت) را در آمریکا (110 ولت) استفاده کنید، به یک آداپتور نیاز دارید. در برنامه‌نویسی هم، وقتی دو کلاس رابط‌های متفاوتی دارند، از Adapter استفاده می‌کنیم تا آن‌ها را به هم متصل کنیم.</p>
+<h2>🤔 مشکل</h2>
+<p>تصور کنید در حال توسعه یک برنامه <strong>نمایش داده‌های بورس</strong> هستید. برنامه شما داده‌ها را از منابع مختلف به فرمت <strong>XML</strong> دریافت می‌کند و نمودارهای زیبایی نمایش می‌دهد.</p>
+<pre><code class="language-csharp">// کد موجود شما
+public class StockMarketApp
+{
+    public void DisplayData(XmlData data)
+    {
+        // پردازش و نمایش داده XML
+    }
+}
+</code></pre>
+<p>حالا می‌خواهید از یک <strong>کتابخانه تحلیل پیشرفته شخص ثالث</strong> استفاده کنید که ویژگی‌های فوق‌العاده‌ای دارد. اما مشکل:</p>
+<pre><code class="language-csharp">// کتابخانه شخص ثالث
+public class AdvancedAnalytics
+{
+    public void Analyze(JsonData data) // فقط JSON می‌پذیرد! ❌
+    {
+        // تحلیل پیشرفته...
+    }
+}
+</code></pre>
+<h3>مشکلات:</h3>
+<ol>
+<li><strong>رابط ناسازگار</strong>: کتابخانه JSON می‌خواهد، برنامه شما XML دارد</li>
+<li><strong>نمی‌توانید کد کتابخانه را تغییر دهید</strong>: شخص ثالث است!</li>
+<li><strong>نمی‌خواهید کل کد خود را تغییر دهید</strong>: خیلی کار است!</li>
+<li><strong>ممکن است چند کتابخانه ناسازگار داشته باشید</strong>: هر کدام فرمت متفاوت</li>
+</ol>
+<p><strong>نتیجه</strong>: دو قطعه عالی دارید که نمی‌توانند با هم کار کنند! 😢</p>
+<h2>💡 راه‌حل</h2>
+<p>الگوی Adapter این مشکل را با ایجاد یک <strong>لایه واسط</strong> حل می‌کند:</p>
+<pre><code class="language-csharp">// آداپتور: XML را به JSON تبدیل می‌کند
+public class XmlToJsonAdapter : IAnalytics
+{
+    private AdvancedAnalytics _analytics = new();
+    
+    public void Analyze(XmlData xmlData)
+    {
+        // 1. XML را به JSON تبدیل کن
+        JsonData jsonData = ConvertXmlToJson(xmlData);
+        
+        // 2. کتابخانه شخص ثالث را صدا بزن
+        _analytics.Analyze(jsonData);
+    }
+}
+
+// حالا می‌توانید استفاده کنید! ✨
+IAnalytics analytics = new XmlToJsonAdapter();
+analytics.Analyze(xmlData); // کار می‌کند!
+</code></pre>
+<p><strong>مزایا:</strong></p>
+<ul>
+<li>✅ کد موجود تغییر نمی‌کند</li>
+<li>✅ کتابخانه شخص ثالث تغییر نمی‌کند</li>
+<li>✅ انعطاف‌پذیری کامل</li>
+<li>✅ می‌توانید چند آداپتور داشته باشید</li>
+</ul>
+<h2>💻 پیاده‌سازی با C#</h2>
+<h3>مثال 1: سیستم پرداخت</h3>
+<pre><code class="language-csharp">// رابط مورد انتظار سیستم ما
+public interface IPaymentProcessor
+{
+    void ProcessPayment(decimal amount, string currency);
+    bool ValidatePayment();
+}
+
+// پیاده‌سازی داخلی ما
+public class InternalPaymentProcessor : IPaymentProcessor
+{
+    public void ProcessPayment(decimal amount, string currency)
+    {
+        Console.WriteLine($&quot;💳 پرداخت داخلی: {amount} {currency}&quot;);
+    }
+    
+    public bool ValidatePayment() =&gt; true;
+}
+
+// کتابخانه شخص ثالث با رابط متفاوت
+public class PayPalService
+{
+    public void MakePayment(double amountInDollars)
+    {
+        Console.WriteLine($&quot;🌐 PayPal: ${amountInDollars} پرداخت شد&quot;);
+    }
+    
+    public bool CheckAccount()
+    {
+        Console.WriteLine(&quot;✅ حساب PayPal تایید شد&quot;);
+        return true;
+    }
+}
+
+// Adapter: PayPal را به رابط ما متصل می‌کند
+public class PayPalAdapter : IPaymentProcessor
+{
+    private readonly PayPalService _payPal;
+    
+    public PayPalAdapter(PayPalService payPal)
+    {
+        _payPal = payPal;
+    }
+    
+    public void ProcessPayment(decimal amount, string currency)
+    {
+        // تبدیل به دلار (اگر لازم باشد)
+        double amountInDollars = currency == &quot;USD&quot; 
+            ? (double)amount 
+            : (double)amount / 42000; // تبدیل تومان به دلار
+        
+        _payPal.MakePayment(amountInDollars);
+    }
+    
+    public bool ValidatePayment()
+    {
+        return _payPal.CheckAccount();
+    }
+}
+
+// استفاده
+class Program
+{
+    static void Main()
+    {
+        // سیستم پرداخت داخلی
+        IPaymentProcessor internal = new InternalPaymentProcessor();
+        internal.ProcessPayment(1000000, &quot;IRR&quot;);
+        
+        // PayPal از طریق Adapter
+        IPaymentProcessor paypal = new PayPalAdapter(new PayPalService());
+        paypal.ProcessPayment(1000000, &quot;IRR&quot;);
+        paypal.ValidatePayment();
+    }
+}
+</code></pre>
+<h3>خروجی:</h3>
+<pre><code>💳 پرداخت داخلی: 1000000 IRR
+🌐 PayPal: $23.81 پرداخت شد
+✅ حساب PayPal تایید شد
+</code></pre>
+<h3>مثال 2: سیستم Logger</h3>
+<pre><code class="language-csharp">// رابط Logger استاندارد ما
+public interface ILogger
+{
+    void Log(string message, LogLevel level);
+}
+
+public enum LogLevel { Info, Warning, Error }
+
+// کتابخانه قدیمی با رابط متفاوت
+public class LegacyLogger
+{
+    public void WriteLog(int severity, string text)
+    {
+        Console.WriteLine($&quot;[Legacy] Severity {severity}: {text}&quot;);
+    }
+}
+
+// Adapter
+public class LegacyLoggerAdapter : ILogger
+{
+    private readonly LegacyLogger _legacyLogger;
+    
+    public LegacyLoggerAdapter(LegacyLogger legacyLogger)
+    {
+        _legacyLogger = legacyLogger;
+    }
+    
+    public void Log(string message, LogLevel level)
+    {
+        // تبدیل LogLevel به severity number
+        int severity = level switch
+        {
+            LogLevel.Info =&gt; 1,
+            LogLevel.Warning =&gt; 2,
+            LogLevel.Error =&gt; 3,
+            _ =&gt; 0
+        };
+        
+        _legacyLogger.WriteLog(severity, message);
+    }
+}
+
+// استفاده
+ILogger logger = new LegacyLoggerAdapter(new LegacyLogger());
+logger.Log(&quot;سیستم راه‌اندازی شد&quot;, LogLevel.Info);
+logger.Log(&quot;حافظه کم است&quot;, LogLevel.Warning);
+logger.Log(&quot;خطای دیتابیس&quot;, LogLevel.Error);
+</code></pre>
+<h2>🎯 مثال کاربردی: تبدیل فرمت داده</h2>
+<pre><code class="language-csharp">// رابط مورد انتظار
+public interface IDataProvider
+{
+    List&lt;Customer&gt; GetCustomers();
+}
+
+public class Customer
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+}
+
+// سرویس قدیمی که CSV برمی‌گرداند
+public class CsvDataService
+{
+    public string GetCustomersAsCsv()
+    {
+        return &quot;1,علی,ali@email.com\n2,رضا,reza@email.com\n3,مریم,maryam@email.com&quot;;
+    }
+}
+
+// Adapter: CSV را به List&lt;Customer&gt; تبدیل می‌کند
+public class CsvToCustomerAdapter : IDataProvider
+{
+    private readonly CsvDataService _csvService;
+    
+    public CsvToCustomerAdapter(CsvDataService csvService)
+    {
+        _csvService = csvService;
+    }
+    
+    public List&lt;Customer&gt; GetCustomers()
+    {
+        string csv = _csvService.GetCustomersAsCsv();
+        var customers = new List&lt;Customer&gt;();
+        
+        foreach (var line in csv.Split('\n'))
+        {
+            var parts = line.Split(',');
+            customers.Add(new Customer
+            {
+                Id = int.Parse(parts[0]),
+                Name = parts[1],
+                Email = parts[2]
+            });
+        }
+        
+        return customers;
+    }
+}
+
+// استفاده
+IDataProvider provider = new CsvToCustomerAdapter(new CsvDataService());
+var customers = provider.GetCustomers();
+
+foreach (var customer in customers)
+{
+    Console.WriteLine($&quot;👤 {customer.Name} - {customer.Email}&quot;);
+}
+</code></pre>
+<h2>⚖️ مزایا و معایب</h2>
+<h3>مزایا ✅</h3>
+<ol>
+<li><strong>اصل تک مسئولیتی (SRP)</strong>: منطق تبدیل از کد کسب‌وکار جدا است</li>
+<li><strong>اصل باز/بسته (OCP)</strong>: می‌توانید Adapter های جدید بدون تغییر کد موجود اضافه کنید</li>
+<li><strong>استفاده مجدد</strong>: کدهای قدیمی یا شخص ثالث را بدون تغییر استفاده کنید</li>
+<li><strong>انعطاف‌پذیری</strong>: چندین Adapter برای چندین Adaptee</li>
+<li><strong>جداسازی</strong>: Client از جزئیات Adaptee بی‌اطلاع است</li>
+<li><strong>یکپارچگی</strong>: سیستم‌های مختلف را به هم متصل کنید</li>
+</ol>
+<h3>معایب ❌</h3>
+<ol>
+<li><strong>پیچیدگی کد</strong>: کلاس‌های اضافی ایجاد می‌شود</li>
+<li><strong>Performance</strong>: یک لایه اضافی در فراخوانی‌ها</li>
+<li><strong>ممکن است ساده‌تر باشد</strong>: گاهی تغییر مستقیم کد ساده‌تر است</li>
+<li><strong>نگهداری</strong>: باید هم Client و هم Adaptee را نگهداری کنید</li>
+</ol>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<h3>✅ استفاده کنید وقتی:</h3>
+<ol>
+<li><strong>کلاس موجود استفاده می‌کنید</strong>: اما رابط آن با کد شما سازگار نیست</li>
+<li><strong>کتابخانه شخص ثالث</strong>: نمی‌توانید کد آن را تغییر دهید</li>
+<li><strong>کدهای قدیمی (Legacy)</strong>: می‌خواهید کد قدیمی را با سیستم جدید ادغام کنید</li>
+<li><strong>چندین کلاس مشابه</strong>: با رابط‌های متفاوت که می‌خواهید یکسان کنید</li>
+<li><strong>Middleware</strong>: نیاز به لایه واسط بین دو سیستم</li>
+<li><strong>یکپارچه‌سازی</strong>: اتصال سیستم‌های مختلف</li>
+</ol>
+<h3>❌ استفاده نکنید وقتی:</h3>
+<ol>
+<li><strong>می‌توانید رابط را تغییر دهید</strong>: بهتر است مستقیماً رابط را اصلاح کنید</li>
+<li><strong>فقط یک جا استفاده می‌شود</strong>: پیچیدگی اضافی توجیه ندارد</li>
+<li><strong>Performance حیاتی است</strong>: Adapter یک لایه اضافی ایجاد می‌کند</li>
+<li><strong>تبدیل بسیار پیچیده</strong>: شاید الگوی دیگری مناسب‌تر باشد</li>
+</ol>
+<h2>🎯 کاربردهای واقعی</h2>
+<ol>
+<li><strong>Data Access Layer</strong>: تبدیل بین ORM های مختلف</li>
+<li><strong>Third-Party Libraries</strong>: ادغام کتابخانه‌های خارجی</li>
+<li><strong>Legacy Code Integration</strong>: اتصال کدهای قدیمی به سیستم‌های جدید</li>
+<li><strong>API Wrapper</strong>: پوشش دادن API های external</li>
+<li><strong>Database Adapters</strong>: ADO.NET Providers برای DB های مختلف</li>
+<li><strong>UI Frameworks</strong>: تبدیل بین framework های مختلف</li>
+<li><strong>Logging Systems</strong>: یکپارچه‌سازی logger های مختلف</li>
+<li><strong>Payment Gateways</strong>: اتصال درگاه‌های پرداخت مختلف</li>
+</ol>
+<h2>💡 نکات پیاده‌سازی و Best Practices</h2>
+<h3>1. ترجیح Composition بر Inheritance</h3>
+<pre><code class="language-csharp">// ✅ خوب - Object Adapter با Composition
+public class GoodAdapter : ITarget
+{
+    private readonly Adaptee _adaptee;
+    public GoodAdapter(Adaptee adaptee) =&gt; _adaptee = adaptee;
+}
+
+// ❌ بد - Class Adapter با Inheritance (در C# محدود است)
+public class BadAdapter : Adaptee, ITarget
+{
+    // مشکل: فقط یک کلاس می‌توان ارث برد
+}
+</code></pre>
+<h3>2. استفاده از Dependency Injection</h3>
+<pre><code class="language-csharp">// در ASP.NET Core
+services.AddScoped&lt;IPaymentProcessor, PayPalAdapter&gt;();
+services.AddSingleton&lt;PayPalService&gt;();
+</code></pre>
+<h3>3. Adapter Chain (زنجیره Adapter ها)</h3>
+<pre><code class="language-csharp">// می‌توانید چند Adapter را به هم زنجیر کنید
+ITarget adapter = new AdapterB(new AdapterA(new Adaptee()));
+</code></pre>
+<h3>4. Two-Way Adapter (دوطرفه)</h3>
+<pre><code class="language-csharp">public class TwoWayAdapter : ITarget, IAdaptee
+{
+    public void TargetMethod() =&gt; AdapteeMethod();
+    public void AdapteeMethod() =&gt; TargetMethod();
+}
+</code></pre>
+<h3>5. Caching در Adapter</h3>
+<pre><code class="language-csharp">public class CachedAdapter : ITarget
+{
+    private readonly Adaptee _adaptee;
+    private string _cachedResult;
+    
+    public string Request()
+    {
+        return _cachedResult ??= _adaptee.SpecificRequest();
+    }
+}
+</code></pre>
+<h2>📚 ارتباط با الگوهای دیگر</h2>
+<pre><code class="language-mermaid">graph TD
+    A[Adapter]
+    B[Bridge]
+    C[Decorator]
+    D[Facade]
+    E[Proxy]
+    
+    A -.-&gt;|مشابه اما&lt;br/&gt;زمان متفاوت| B
+    A -.-&gt;|مشابه اما&lt;br/&gt;هدف متفاوت| C
+    A -.-&gt;|Facade از&lt;br/&gt;Adapter استفاده می‌کند| D
+    A -.-&gt;|رابط را تغییر می‌دهد&lt;br/&gt;vs رابط مشابه| E
+</code></pre>
+<h3>روابط:</h3>
+<ul>
+<li><strong>Bridge</strong>: مشابه Adapter اما در زمان طراحی، نه بعد از آن</li>
+<li><strong>Decorator</strong>: رابط را تغییر نمی‌دهد، فقط قابلیت اضافه می‌کند</li>
+<li><strong>Facade</strong>: ساده‌سازی می‌کند، نه تبدیل</li>
+<li><strong>Proxy</strong>: رابط مشابه، اما کنترل دسترسی می‌کند</li>
+</ul>
+<h2>🔑 نکات کلیدی</h2>
+<blockquote>
+<p><strong>💡 یادآوری مهم</strong>:</p>
+<p><strong>Adapter = اتصال‌دهنده دو سیستم ناسازگار</strong></p>
+<p>زمانی از Adapter استفاده کنید که:</p>
+<ul>
+<li>✅ کد موجود نمی‌توانید تغییر دهید</li>
+<li>✅ رابط‌ها ناسازگار هستند</li>
+<li>✅ می‌خواهید کدهای مختلف را یکپارچه کنید</li>
+</ul>
+<p>Adapter <strong>بعد از طراحی</strong> استفاده می‌شود تا مشکل <strong>سازگاری</strong> را حل کند.</p>
+</blockquote>
+<h2>⚠️ اشتباهات رایج</h2>
+<h3>1. Adapter خیلی پیچیده</h3>
+<pre><code class="language-csharp">// ❌ بد - Adapter نباید منطق کسب‌وکار داشته باشد
+public class BadAdapter : ITarget
+{
+    public void Request()
+    {
+        // منطق کسب‌وکار پیچیده ❌
+        if (complexBusinessLogic)
+        {
+            // ...
+        }
+        _adaptee.SpecificRequest();
+    }
+}
+
+// ✅ خوب - فقط تبدیل
+public class GoodAdapter : ITarget
+{
+    public void Request()
+    {
+        // فقط تبدیل ساده
+        _adaptee.SpecificRequest();
+    }
+}
+</code></pre>
+<h3>2. استفاده نادرست از Class Adapter</h3>
+<pre><code class="language-csharp">// ❌ بد - در C# محدودیت وراثت چندگانه
+// استفاده از Object Adapter بهتر است
+</code></pre>
+<h3>3. فراموش کردن Exception Handling</h3>
+<pre><code class="language-csharp">// ✅ خوب - مدیریت خطا
+public class SafeAdapter : ITarget
+{
+    public void Request()
+    {
+        try
+        {
+            _adaptee.SpecificRequest();
+        }
+        catch (AdapteeException ex)
+        {
+            throw new TargetException(&quot;خطا در Adapter&quot;, ex);
+        }
+    }
+}
+</code></pre>
+<h2>🎯 خلاصه</h2>
+<p>Adapter یک الگوی ساده اما قدرتمند است که:</p>
+<ul>
+<li>✅ <strong>سازگاری</strong> بین رابط‌های مختلف ایجاد می‌کند</li>
+<li>✅ <strong>استفاده مجدد</strong> از کدهای موجود بدون تغییر</li>
+<li>✅ <strong>یکپارچه‌سازی</strong> سیستم‌های مختلف</li>
+<li>✅ <strong>انعطاف‌پذیری</strong> در ادغام کتابخانه‌های شخص ثالث</li>
+</ul>
+<p>استفاده کنید برای:</p>
+<ul>
+<li>✅ کتابخانه‌های شخص ثالث</li>
+<li>✅ کدهای قدیمی (Legacy)</li>
+<li>✅ API های external</li>
+<li>✅ یکپارچه‌سازی سیستم‌ها</li>
+</ul>
+<hr>
+<p><strong><a href="../index.html">🏠 بازگشت به صفحه اصلی</a></strong></p>

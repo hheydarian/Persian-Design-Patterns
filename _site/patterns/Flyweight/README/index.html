@@ -1,0 +1,322 @@
+<h1>الگوی Flyweight (وزن سبک)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Flyweight یک الگوی طراحی ساختاری است که به شما امکان می‌دهد اشیاء بیشتری را در RAM موجود جای دهید با اشتراک‌گذاری قسمت‌های مشترک حالت بین اشیاء متعدد به جای نگه‌داشتن تمام داده‌ها در هر شیء.</p>
+<h2>🤔 مشکل</h2>
+<p>تصور کنید تصمیم گرفتید یک بازی ویدیویی ساده بسازید: بازیکن‌ها می‌توانند در نقشه حرکت کنند و به یکدیگر شلیک کنند. شما تصمیم گرفتید یک سیستم ذرات واقع‌گرایانه پیاده‌سازی کنید و آن را به ویژگی متمایز بازی تبدیل کنید. مقادیر عظیمی از گلوله، موشک و شظیه‌های انفجار باید در سراسر نقشه پرواز کنند و تجربه‌ای هیجان‌انگیز برای بازیکن ایجاد کنند.</p>
+<p>پس از اتمام آن، آخرین commit را push کردید، بازی را build کردید و آن را برای یک دوست ارسال کردید. با اینکه بازی بر روی دستگاه شما به خوبی اجرا می‌شد، دوست شما نتوانست مدت زیادی بازی کند. بازی در دستگاه او بعد از چند دقیقه crash می‌کرد. چندین ساعت صرف بررسی logs دیباگ کردید و دریافتید که بازی به دلیل حافظه ناکافی crash می‌کند.</p>
+<h2>💡 راه‌حل</h2>
+<p>الگوی Flyweight پیشنهاد می‌کند که نگه‌داری حالت intrinsic (ذاتی) را در شیء متوقف کنید. به جای آن، این حالت را به متدهای خاصی که به آن وابسته هستند منتقل کنید. فقط حالت intrinsic در شیء باقی می‌ماند و آن را در contexts مختلف قابل استفاده مجدد می‌کند.</p>
+<p>به عنوان نتیجه، تعداد کمتری از این اشیاء نیاز دارید زیرا آن‌ها فقط در حالت intrinsic متفاوت هستند که نسبت به extrinsic تنوع بسیار کمتری دارد.</p>
+<h2>⚖️ پیامدها</h2>
+<h3>مزایا ✅</h3>
+<ul>
+<li><strong>کاهش استفاده از حافظه</strong>: زمانی که برنامه باید اشیاء مشابه زیادی ایجاد کند</li>
+<li><strong>بهبود کارایی</strong>: به خصوص زمانی که حافظه محدود است</li>
+</ul>
+<h3>معایب ❌</h3>
+<ul>
+<li><strong>پیچیدگی کد</strong>: کد ممکن است پیچیده‌تر شود</li>
+<li><strong>نیاز به تفکیک حالت</strong>: باید حالت intrinsic و extrinsic را تشخیص دهید</li>
+<li><strong>عدم thread-safety</strong>: نیاز به مدیریت ویژه در محیط چندنخی</li>
+</ul>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+namespace FlyweightPattern
+{
+    // Flyweight - حالت ذاتی (intrinsic) - اطلاعات مشترک بین درخت‌ها
+    public class TreeType
+    {
+        public string Name { get; private set; }
+        public string Color { get; private set; }
+        public string Texture { get; private set; }
+
+        public TreeType(string name, string color, string texture)
+        {
+            Name = name;
+            Color = color;
+            Texture = texture;
+        }
+
+        // متد رسم درخت با استفاده از موقعیت بیرونی
+        public void Draw(int x, int y)
+        {
+            Console.WriteLine($&quot;🌳 کشیدن درخت {Name} با رنگ {Color} در ({x}, {y})&quot;);
+        }
+    }
+
+    // Flyweight Factory - مدیریت و ایجاد Flyweights
+    public class TreeFactory
+    {
+        // دیکشنری برای نگهداری انواع درخت‌های ایجاد شده
+        private static Dictionary&lt;string, TreeType&gt; _treeTypes = new Dictionary&lt;string, TreeType&gt;();
+
+        // دریافت یا ایجاد نوع درخت
+        public static TreeType GetTreeType(string name, string color, string texture)
+        {
+            string key = $&quot;{name}_{color}_{texture}&quot;;
+
+            if (!_treeTypes.ContainsKey(key))
+            {
+                Console.WriteLine($&quot;✨ ایجاد نوع درخت جدید: {name}&quot;);
+                _treeTypes[key] = new TreeType(name, color, texture);
+            }
+            else
+            {
+                Console.WriteLine($&quot;♻️ استفاده مجدد از نوع درخت موجود: {name}&quot;);
+            }
+
+            return _treeTypes[key];
+        }
+
+        // دریافت تعداد کل انواع درخت‌های ایجاد شده
+        public static int GetTotalTypes()
+        {
+            return _treeTypes.Count;
+        }
+    }
+
+    // Context Object - حالت بیرونی (extrinsic) - اطلاعات منحصربه‌فرد هر درخت
+    public class Tree
+    {
+        // موقعیت درخت (extrinsic state)
+        public int X { get; private set; }
+        public int Y { get; private set; }
+        
+        // ارجاع به Flyweight (intrinsic state)
+        private TreeType _treeType;
+
+        public Tree(int x, int y, TreeType treeType)
+        {
+            X = x;
+            Y = y;
+            _treeType = treeType;
+        }
+
+        // رسم درخت با استفاده از Flyweight
+        public void Draw()
+        {
+            _treeType.Draw(X, Y);
+        }
+    }
+
+    // Client - مدیریت مجموعه درخت‌ها
+    public class Forest
+    {
+        private List&lt;Tree&gt; _trees = new List&lt;Tree&gt;();
+
+        // کاشت درخت جدید در جنگل
+        public void PlantTree(int x, int y, string name, string color, string texture)
+        {
+            TreeType treeType = TreeFactory.GetTreeType(name, color, texture);
+            Tree tree = new Tree(x, y, treeType);
+            _trees.Add(tree);
+        }
+
+        // رسم تمام درخت‌های جنگل
+        public void Draw()
+        {
+            Console.WriteLine(&quot;\n🌲 رسم جنگل:&quot;);
+            Console.WriteLine(new string('-', 60));
+            
+            foreach (var tree in _trees)
+            {
+                tree.Draw();
+            }
+
+            // نمایش آمار صرفه‌جویی حافظه
+            Console.WriteLine($&quot;\n📊 تعداد درخت‌ها: {_trees.Count}&quot;);
+            Console.WriteLine($&quot;📦 تعداد انواع درخت (Flyweights): {TreeFactory.GetTotalTypes()}&quot;);
+            Console.WriteLine($&quot;💾 صرفه‌جویی حافظه: {_trees.Count - TreeFactory.GetTotalTypes()} شیء&quot;);
+        }
+    }
+
+    // برنامه اصلی
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // تنظیم کدگذاری برای نمایش صحیح فارسی
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine(&quot;🌳 الگوی Flyweight - جنگل&quot;);
+            Console.WriteLine(new string('=', 60));
+
+            // ایجاد جنگل
+            Forest forest = new Forest();
+
+            Console.WriteLine(&quot;\n🌱 کاشت درخت‌ها:&quot;);
+            Console.WriteLine(new string('-', 60));
+
+            // کاشت درخت‌های مختلف
+            forest.PlantTree(10, 20, &quot;بلوط&quot;, &quot;سبز&quot;, &quot;texture1&quot;);
+            forest.PlantTree(50, 30, &quot;کاج&quot;, &quot;سبز تیره&quot;, &quot;texture2&quot;);
+            forest.PlantTree(80, 40, &quot;بلوط&quot;, &quot;سبز&quot;, &quot;texture1&quot;);      // استفاده مجدد
+            forest.PlantTree(100, 50, &quot;افرا&quot;, &quot;زرد&quot;, &quot;texture3&quot;);
+            forest.PlantTree(120, 60, &quot;کاج&quot;, &quot;سبز تیره&quot;, &quot;texture2&quot;); // استفاده مجدد
+            forest.PlantTree(140, 70, &quot;بلوط&quot;, &quot;سبز&quot;, &quot;texture1&quot;);      // استفاده مجدد
+            forest.PlantTree(160, 80, &quot;صنوبر&quot;, &quot;سبز&quot;, &quot;texture4&quot;);
+            forest.PlantTree(180, 90, &quot;بلوط&quot;, &quot;سبز&quot;, &quot;texture1&quot;);      // استفاده مجدد
+
+            // رسم جنگل و نمایش آمار
+            forest.Draw();
+
+            Console.WriteLine(&quot;\nبرای خروج کلیدی را فشار دهید...&quot;);
+            Console.ReadKey();
+        }
+    }
+}
+</code></pre>
+<h3>📤 خروجی برنامه:</h3>
+<pre><code>🌳 الگوی Flyweight - جنگل
+============================================================
+
+🌱 کاشت درخت‌ها:
+------------------------------------------------------------
+✨ ایجاد نوع درخت جدید: بلوط
+✨ ایجاد نوع درخت جدید: کاج
+♻️ استفاده مجدد از نوع درخت موجود: بلوط
+✨ ایجاد نوع درخت جدید: افرا
+♻️ استفاده مجدد از نوع درخت موجود: کاج
+♻️ استفاده مجدد از نوع درخت موجود: بلوط
+✨ ایجاد نوع درخت جدید: صنوبر
+♻️ استفاده مجدد از نوع درخت موجود: بلوط
+
+🌲 رسم جنگل:
+------------------------------------------------------------
+🌳 کشیدن درخت بلوط با رنگ سبز در (10, 20)
+🌳 کشیدن درخت کاج با رنگ سبز تیره در (50, 30)
+🌳 کشیدن درخت بلوط با رنگ سبز در (80, 40)
+🌳 کشیدن درخت افرا با رنگ زرد در (100, 50)
+🌳 کشیدن درخت کاج با رنگ سبز تیره در (120, 60)
+🌳 کشیدن درخت بلوط با رنگ سبز در (140, 70)
+🌳 کشیدن درخت صنوبر با رنگ سبز در (160, 80)
+🌳 کشیدن درخت بلوط با رنگ سبز در (180, 90)
+
+📊 تعداد درخت‌ها: 8
+📦 تعداد انواع درخت (Flyweights): 4
+💾 صرفه‌جویی حافظه: 4 شیء
+</code></pre>
+<h2>🎯 مثال کاربردی واقعی</h2>
+<h3>مثال 1: سیستم متن (کاراکترها)</h3>
+<pre><code class="language-csharp">// Flyweight - اطلاعات مشترک کاراکتر
+public class Character
+{
+    public char Char { get; private set; }
+    public string Font { get; private set; }
+    public int Size { get; private set; }
+
+    public Character(char ch, string font, int size)
+    {
+        Char = ch;
+        Font = font;
+        Size = size;
+    }
+
+    public void Display(int row, int col, string color)
+    {
+        Console.WriteLine($&quot;'{Char}' در ({row},{col}) با فونت {Font}، اندازه {Size}، رنگ {color}&quot;);
+    }
+}
+
+// Factory برای مدیریت کاراکترها
+public class CharacterFactory
+{
+    private static Dictionary&lt;string, Character&gt; _characters = new Dictionary&lt;string, Character&gt;();
+
+    public static Character GetCharacter(char ch, string font, int size)
+    {
+        string key = $&quot;{ch}_{font}_{size}&quot;;
+        
+        if (!_characters.ContainsKey(key))
+        {
+            _characters[key] = new Character(ch, font, size);
+        }
+        
+        return _characters[key];
+    }
+}
+
+// ویرایشگر متن که از Flyweight استفاده می‌کند
+public class TextEditor
+{
+    private List&lt;(Character character, int row, int col, string color)&gt; _characters = 
+        new List&lt;(Character, int, int, string)&gt;();
+
+    public void Insert(char ch, string font, int size, int row, int col, string color)
+    {
+        Character character = CharacterFactory.GetCharacter(ch, font, size);
+        _characters.Add((character, row, col, color));
+    }
+
+    public void Render()
+    {
+        foreach (var (character, row, col, color) in _characters)
+        {
+            character.Display(row, col, color);
+        }
+    }
+}
+</code></pre>
+<h3>مثال 2: سیستم آیکون</h3>
+<pre><code class="language-csharp">// Flyweight برای آیکون‌ها
+public class Icon
+{
+    public string IconType { get; private set; }
+    public byte[] ImageData { get; private set; }
+
+    public Icon(string iconType, byte[] imageData)
+    {
+        IconType = iconType;
+        ImageData = imageData; // داده تصویر (حجیم)
+    }
+
+    public void Render(int x, int y)
+    {
+        Console.WriteLine($&quot;🎨 رندر آیکون {IconType} در ({x}, {y})&quot;);
+    }
+}
+
+// Factory برای مدیریت آیکون‌ها
+public class IconFactory
+{
+    private static Dictionary&lt;string, Icon&gt; _icons = new Dictionary&lt;string, Icon&gt;();
+
+    public static Icon GetIcon(string iconType)
+    {
+        if (!_icons.ContainsKey(iconType))
+        {
+            // بارگذاری تصویر از دیسک (عملیات گران)
+            byte[] imageData = LoadImage(iconType);
+            _icons[iconType] = new Icon(iconType, imageData);
+        }
+        
+        return _icons[iconType];
+    }
+
+    private static byte[] LoadImage(string iconType)
+    {
+        Console.WriteLine($&quot;💿 بارگذاری تصویر {iconType} از دیسک...&quot;);
+        // شبیه‌سازی بارگذاری تصویر
+        return new byte[1024]; 
+    }
+}
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li><strong>زمانی که برنامه باید تعداد زیادی شیء ایجاد کند</strong></li>
+<li><strong>زمانی که ذخیره‌سازی تمام اشیاء RAM زیادی مصرف می‌کند</strong></li>
+<li><strong>زمانی که بیشتر حالت شیء extrinsic است</strong></li>
+<li><strong>زمانی که می‌توانید اشیاء مشابه را با تعداد کمی شیء مشترک جایگزین کنید</strong></li>
+</ol>
+<h2>📝 نکات مهم</h2>
+<h3>تفاوت Intrinsic و Extrinsic:</h3>
+<ul>
+<li><strong>Intrinsic (ذاتی)</strong>: حالتی که بین اشیاء مشترک است و در Flyweight ذخیره می‌شود</li>
+<li><strong>Extrinsic (بیرونی)</strong>: حالتی که بین اشیاء متفاوت است و توسط Client نگهداری می‌شود</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Flyweight با اشتراک‌گذاری هوشمندانه، حافظه را بهینه می‌کند! 🪶</p>
+</blockquote>

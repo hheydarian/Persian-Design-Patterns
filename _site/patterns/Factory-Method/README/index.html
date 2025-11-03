@@ -1,0 +1,380 @@
+<h1>🏭 الگوی Factory Method (فکتوری متد)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی <strong>Factory Method</strong> یک الگوی طراحی سازنده (Creational) است که <strong>رابطی برای ایجاد اشیاء تعریف می‌کند، اما تصمیم‌گیری درباره نوع دقیق شیء را به زیرکلاس‌ها واگذار می‌کند</strong>. این الگو به زیرکلاس‌ها اجازه می‌دهد تا نوع اشیاء ساخته‌شده را تغییر دهند.</p>
+<p>به زبان ساده‌تر، Factory Method مانند یک <strong>کارخانه هوشمند</strong> است که بسته به شرایط، محصولات مختلفی تولید می‌کند. شما به کارخانه می‌گویید &quot;یک محصول بساز&quot; اما کارخانه خودش تصمیم می‌گیرد که چه نوع محصولی بسازد.</p>
+<h2>🤔 مشکل</h2>
+<p>تصور کنید در حال توسعه یک سیستم <strong>مدیریت لجستیک</strong> هستید. نسخه اولیه شما فقط <strong>حمل‌ونقل جاده‌ای</strong> (با کامیون) را پشتیبانی می‌کند، بنابراین بیشتر کدهای شما در کلاس <code>Truck</code> قرار دارد.</p>
+<p>کد اولیه - فقط کامیون:</p>
+<pre><code class="language-csharp">
+public class LogisticsApp
+{
+    public void PlanDelivery()
+    {
+        Truck truck = new Truck();
+        truck.Deliver();
+    }
+}
+</code></pre>
+<p>بعد از مدتی، برنامه شما محبوب می‌شود و مشتریان درخواست می‌کنند که <strong>حمل‌ونقل دریایی</strong> هم اضافه کنید. خبر خوب! اما کد چطور؟ 😰</p>
+<h3>مشکلات رویکرد سنتی:</h3>
+<p><strong>1. وابستگی مستقیم به کلاس‌های مشخص</strong></p>
+<p>مجبوریم در همه جا if-else بنویسیم:</p>
+<pre><code class="language-csharp">
+
+public void PlanDelivery(string type)
+{
+    if (type == &quot;road&quot;)
+    {
+        Truck truck = new Truck();
+        truck.Deliver();
+    }
+    else if (type == &quot;sea&quot;)
+    {
+        Ship ship = new Ship();
+        ship.Deliver();
+    }
+    // اگر بخواهیم هوایی اضافه کنیم، باید دوباره تمام این if-else ها را تغییر دهیم!
+}
+</code></pre>
+<p><strong>2. نقض اصل Open/Closed</strong></p>
+<ul>
+<li>برای افزودن نوع جدید باید کد موجود را تغییر دهیم</li>
+<li>خطر ایجاد باگ در کدهای کارآمد موجود</li>
+</ul>
+<p><strong>3. کد تکراری</strong></p>
+<ul>
+<li>همان منطق if-else در جاهای مختلف تکرار می‌شود</li>
+<li>نگهداری سخت</li>
+</ul>
+<p><strong>4. تست سخت</strong></p>
+<ul>
+<li>نمی‌توانیم به راحتی Mock کنیم</li>
+<li>باید همه حالت‌ها را تست کنیم</li>
+</ul>
+<p><strong>نتیجه</strong>: کدی پر از شرط‌های conditional که با هر نوع جدید، پیچیده‌تر می‌شود! 🍝</p>
+<h2>💡 راه‌حل</h2>
+<p>الگوی Factory Method این مشکل را با <strong>تفویض مسئولیت ساخت</strong> حل می‌کند:</p>
+<ol>
+<li><strong>رابط مشترک</strong>: همه وسایل حمل‌ونقل یک رابط مشترک پیاده‌سازی می‌کنند</li>
+<li><strong>متد کارخانه</strong>: یک متد abstract برای ساخت وسیله نقلیه</li>
+<li><strong>زیرکلاس‌ها</strong>: هر نوع لجستیک، متد کارخانه را override می‌کند</li>
+</ol>
+<p>با Factory Method - تمیز و انعطاف‌پذیر:</p>
+<pre><code class="language-csharp">
+public abstract class Logistics
+{
+    // Factory Method - زیرکلاس‌ها تصمیم می‌گیرند چه چیزی بسازند
+    public abstract ITransport CreateTransport();
+    
+    public void PlanDelivery()
+    {
+        // کد ما دیگر به نوع خاص وابسته نیست!
+        ITransport transport = CreateTransport();
+        transport.Deliver();
+    }
+}
+
+public class RoadLogistics : Logistics
+{
+    public override ITransport CreateTransport() =&gt; new Truck();
+}
+
+public class SeaLogistics : Logistics
+{
+    public override ITransport CreateTransport() =&gt; new Ship();
+}
+</code></pre>
+<p><strong>مزایا:</strong></p>
+<ul>
+<li>✅ افزودن نوع جدید بدون تغییر کد موجود</li>
+<li>✅ کد تمیز و قابل نگهداری</li>
+<li>✅ تست‌پذیری بالا</li>
+<li>✅ انعطاف‌پذیری کامل</li>
+</ul>
+<p>💻 پیاده‌سازی با C#</p>
+<pre><code class="language-csharp">using System;
+
+namespace FactoryMethodPattern
+{
+    // Product Interface
+    public interface ITransport
+    {
+        string Deliver();
+    }
+
+    // Concrete Products
+    public class Truck : ITransport
+    {
+        public string Deliver()
+        {
+            return &quot;🚚 حمل و نقل زمینی با کامیون&quot;;
+        }
+    }
+
+    public class Ship : ITransport
+    {
+        public string Deliver()
+        {
+            return &quot;🚢 حمل و نقل دریایی با کشتی&quot;;
+        }
+    }
+
+    public class Plane : ITransport
+    {
+        public string Deliver()
+        {
+            return &quot;✈️ حمل و نقل هوایی با هواپیما&quot;;
+        }
+    }
+
+    // Creator
+    public abstract class Logistics
+    {
+        // Factory Method
+        public abstract ITransport CreateTransport();
+
+        // Business logic که از factory method استفاده می‌کند
+        public string PlanDelivery()
+        {
+            var transport = CreateTransport();
+            return $&quot;📦 لجستیک: برنامه‌ریزی تحویل...\n{transport.Deliver()}&quot;;
+        }
+    }
+
+    // Concrete Creators
+    public class RoadLogistics : Logistics
+    {
+        public override ITransport CreateTransport()
+        {
+            return new Truck();
+        }
+    }
+
+    public class SeaLogistics : Logistics
+    {
+        public override ITransport CreateTransport()
+        {
+            return new Ship();
+        }
+    }
+
+    public class AirLogistics : Logistics
+    {
+        public override ITransport CreateTransport()
+        {
+            return new Plane();
+        }
+    }
+
+    // Client Code
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.WriteLine(&quot;🏭 الگوی Factory Method در عمل\n&quot;);
+
+            Console.WriteLine(&quot;📍 لجستیک جاده‌ای:&quot;);
+            ClientCode(new RoadLogistics());
+
+            Console.WriteLine(&quot;\n📍 لجستیک دریایی:&quot;);
+            ClientCode(new SeaLogistics());
+
+            Console.WriteLine(&quot;\n📍 لجستیک هوایی:&quot;);
+            ClientCode(new AirLogistics());
+        }
+
+        static void ClientCode(Logistics logistics)
+        {
+            Console.WriteLine(logistics.PlanDelivery());
+            Console.WriteLine(new string('-', 50));
+        }
+    }
+}
+</code></pre>
+<h3>خروجی برنامه:</h3>
+<pre><code>🏭 الگوی Factory Method در عمل
+
+📍 لجستیک جاده‌ای:
+📦 لجستیک: برنامه‌ریزی تحویل...
+🚚 حمل و نقل زمینی با کامیون
+--------------------------------------------------
+
+📍 لجستیک دریایی:
+📦 لجستیک: برنامه‌ریزی تحویل...
+🚢 حمل و نقل دریایی با کشتی
+--------------------------------------------------
+
+📍 لجستیک هوایی:
+📦 لجستیک: برنامه‌ریزی تحویل...
+✈️ حمل و نقل هوایی با هواپیما
+--------------------------------------------------
+</code></pre>
+<h2>⚖️ مزایا و معایب</h2>
+<h3>مزایا ✅</h3>
+<ol>
+<li><strong>اصل تک مسئولیتی (SRP)</strong>: کد ساخت محصول در یک مکان متمرکز است</li>
+<li><strong>اصل باز/بسته (OCP)</strong>: افزودن انواع جدید بدون تغییر کد موجود</li>
+<li><strong>انعطاف‌پذیری بالا</strong>: زیرکلاس‌ها کنترل کامل روی نوع محصول دارند</li>
+<li><strong>جداسازی (Decoupling)</strong>: کد کلاینت از کلاس‌های محصول مشخص جدا است</li>
+<li><strong>تست‌پذیری</strong>: راحت‌تر می‌توان Mock کرد</li>
+<li><strong>قابلیت گسترش</strong>: افزودن نوع جدید بسیار آسان است</li>
+<li><strong>کد تمیز</strong>: بدون if-else یا switch-case های طولانی</li>
+</ol>
+<h3>معایب ❌</h3>
+<ol>
+<li><strong>افزایش تعداد کلاس‌ها</strong>: برای هر محصول جدید، یک Creator جدید نیاز است</li>
+<li><strong>سلسله‌مراتب موازی</strong>: باید هم Product و هم Creator را نگهداری کنید</li>
+<li><strong>پیچیدگی اولیه</strong>: برای سیستم‌های ساده، ممکن است بیش از حد پیچیده باشد</li>
+<li><strong>یادگیری</strong>: درک مفهوم برای مبتدیان کمی سخت است</li>
+</ol>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<h3>✅ استفاده کنید وقتی:</h3>
+<ol>
+<li><strong>نوع دقیق محصول مشخص نیست</strong>: در زمان نوشتن کد نمی‌دانید چه نوع شیءای نیاز خواهید داشت</li>
+<li><strong>نیاز به گسترش‌پذیری</strong>: می‌خواهید سیستم را برای افزودن انواع جدید باز نگه دارید</li>
+<li><strong>کتابخانه/Framework می‌سازید</strong>: کاربران باید بتوانند اجزای داخلی را سفارشی کنند</li>
+<li><strong>جداسازی لازم است</strong>: می‌خواهید کد کلاینت را از جزئیات ساخت جدا کنید</li>
+<li><strong>منطق ساخت پیچیده</strong>: ساخت شیء شامل منطق پیچیده‌ای است</li>
+<li><strong>چندین نوع مرتبط</strong>: خانواده‌ای از محصولات مرتبط دارید</li>
+</ol>
+<h3>❌ استفاده نکنید وقتی:</h3>
+<ol>
+<li><strong>محصولات ثابت هستند</strong>: انواع محصولات تغییر نمی‌کنند</li>
+<li><strong>سیستم ساده است</strong>: پیچیدگی اضافی توجیه ندارد</li>
+<li><strong>یک نوع محصول</strong>: فقط یک نوع محصول وجود دارد</li>
+<li><strong>ساخت ساده است</strong>: فقط <code>new Product()</code> کافی است</li>
+<li><strong>استفاده از DI ساده‌تر است</strong>: Dependency Injection راه‌حل بهتری است</li>
+</ol>
+<h2>🎯 کاربردهای واقعی</h2>
+<ol>
+<li><strong>ADO.NET Data Providers</strong>: <code>DbProviderFactory</code> برای ساخت اتصالات مختلف DB</li>
+<li><strong>ASP.NET Core</strong>: <code>ILoggerFactory</code> برای ساخت loggerهای مختلف</li>
+<li><strong>Entity Framework</strong>: <code>DbContext</code> برای ساخت انواع مختلف database provider</li>
+<li><strong>UI Frameworks</strong>: ساخت کنترل‌های UI بر اساس platform (WPF, WinForms)</li>
+<li><strong>Plugin Systems</strong>: سیستم‌های پلاگین که انواع مختلف plugin می‌سازند</li>
+<li><strong>Game Development</strong>: ساخت انواع مختلف enemies، weapons، characters</li>
+<li><strong>Document Processing</strong>: تولید PDF، Word، Excel با همان interface</li>
+</ol>
+<h2>💡 نکات پیاده‌سازی و Best Practices</h2>
+<h3>1. نامگذاری واضح</h3>
+<pre><code class="language-csharp">// ✅
+public abstract ITransport CreateTransport();
+public abstract IDocument CreateDocument();
+
+// ❌ 
+public abstract ITransport Get();
+public abstract IDocument Make();
+</code></pre>
+<h3>2. پیاده‌سازی پیش‌فرض</h3>
+<pre><code class="language-csharp">
+public abstract class Logistics
+{
+    public virtual ITransport CreateTransport()
+    {
+        return new Truck(); // پیش‌فرض
+    }
+}
+</code></pre>
+<h3>3. استفاده از Generic</h3>
+<pre><code class="language-csharp">public abstract class Creator&lt;T&gt; where T : IProduct
+{
+    public abstract T CreateProduct();
+    
+    public void DoSomething()
+    {
+        var product = CreateProduct();
+        product.Use();
+    }
+}
+</code></pre>
+<h3>4. ترکیب با Dependency Injection</h3>
+<p>// در ASP.NET Core</p>
+<pre><code class="language-csharp">
+services.AddScoped&lt;ITransportFactory, TruckFactory&gt;();
+</code></pre>
+<h3>5. Lazy Initialization</h3>
+<pre><code class="language-csharp">public class CachedFactory : Creator
+{
+    private IProduct _cachedProduct;
+    
+    public override IProduct CreateProduct()
+    {
+        return _cachedProduct ??= new ConcreteProduct();
+    }
+}
+</code></pre>
+<h2>🔑 نکات کلیدی</h2>
+<blockquote>
+<p><strong>💡 یادآوری مهم</strong>:</p>
+<p>Factory Method برای زمانی است که می‌خواهید <strong>فرآیند ساخت را به زیرکلاس‌ها بسپارید</strong>. اگر فقط می‌خواهید ساخت را کپسوله کنید، از <strong>Simple Factory</strong> استفاده کنید.</p>
+<pre><code class="language-csharp">// Simple Factory (ساده‌تر اما کمتر انعطاف‌پذیر)
+public class TransportFactory
+{
+    public ITransport Create(string type)
+    {
+        return type switch
+        {
+            &quot;road&quot; =&gt; new Truck(),
+            &quot;sea&quot; =&gt; new Ship(),
+            _ =&gt; throw new ArgumentException()
+        };
+    }
+}
+</code></pre>
+</blockquote>
+<h2>⚠️ اشتباهات رایج</h2>
+<h3>1. استفاده بیش از حد</h3>
+<pre><code class="language-csharp">// Example
+// ❌ بد - برای یک کلاس ساده نیازی به Factory Method نیست
+public abstract class SimpleObjectFactory
+{
+    public abstract SimpleObject Create();
+}
+
+// ✅ خوب - استفاده مستقیم
+var obj = new SimpleObject();
+</code></pre>
+<h3>2. نقض اصل Liskov Substitution</h3>
+<pre><code class="language-csharp">// Example
+// ❌ بد - زیرکلاس نوع متفاوتی برمی‌گرداند
+public class BadCreator : Creator
+{
+    public override IProduct CreateProduct()
+    {
+        return null; // ❌ اشتباه!
+    }
+}
+</code></pre>
+<h3>3. وابستگی به پیاده‌سازی خاص</h3>
+<pre><code class="language-csharp">// Example
+// ❌ بد - استفاده از کلاس مشخص
+public void Process()
+{
+    Truck truck = (Truck)CreateTransport(); // ❌ اشتباه!
+    truck.LoadCargo();
+}
+
+// ✅ خوب - استفاده از رابط
+public void Process()
+{
+    ITransport transport = CreateTransport();
+    transport.Deliver();
+}
+</code></pre>
+<h2>🎯 خلاصه</h2>
+<p>Factory Method یک الگوی قدرتمند است که:</p>
+<ul>
+<li>✅ <strong>انعطاف‌پذیری</strong> به کد شما می‌دهد</li>
+<li>✅ <strong>قابلیت گسترش</strong> بدون تغییر کد موجود</li>
+<li>✅ <strong>جداسازی</strong> بین ساخت و استفاده</li>
+<li>✅ <strong>تست‌پذیری</strong> بالا با امکان Mock کردن</li>
+</ul>
+<p>اما مناسب نیست برای:</p>
+<ul>
+<li>❌ سیستم‌های بسیار ساده</li>
+<li>❌ زمانی که محصولات ثابت هستند</li>
+<li>❌ وقتی DI می‌تواند نیاز را برآورده کند</li>
+</ul>
+<hr>
+<p><strong><a href="../index.html">🏠 بازگشت به صفحه اصلی</a></strong></p>

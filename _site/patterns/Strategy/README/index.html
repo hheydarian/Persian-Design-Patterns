@@ -1,0 +1,161 @@
+<h1>الگوی Strategy (استراتژی / راهبرد)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Strategy یک الگوی طراحی رفتاری است که خانواده‌ای از الگوریتم‌ها را تعریف می‌کند، هر کدام را در کلاس جداگانه قرار می‌دهد و اشیاء آن‌ها را قابل تعویض می‌کند.</p>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+using System.Linq;
+
+// رابط استراتژی پرداخت
+public interface IPaymentStrategy
+{
+    void Pay(decimal amount);
+}
+
+// استراتژی پرداخت با کارت اعتباری
+public class CreditCardStrategy : IPaymentStrategy
+{
+    private readonly string _cardNumber;
+
+    public CreditCardStrategy(string cardNumber)
+    {
+        _cardNumber = cardNumber;
+    }
+
+    public void Pay(decimal amount)
+    {
+        Console.WriteLine($&quot;💳 پرداخت {amount:N0} تومان با کارت {_cardNumber}&quot;);
+    }
+}
+
+// استراتژی پرداخت با PayPal
+public class PayPalStrategy : IPaymentStrategy
+{
+    private readonly string _email;
+
+    public PayPalStrategy(string email)
+    {
+        _email = email;
+    }
+
+    public void Pay(decimal amount)
+    {
+        Console.WriteLine($&quot;🌐 پرداخت {amount:N0} تومان با PayPal ({_email})&quot;);
+    }
+}
+
+// استراتژی پرداخت با ارز دیجیتال
+public class CryptoStrategy : IPaymentStrategy
+{
+    private readonly string _wallet;
+
+    public CryptoStrategy(string wallet)
+    {
+        _wallet = wallet;
+    }
+
+    public void Pay(decimal amount)
+    {
+        Console.WriteLine($&quot;₿ پرداخت {amount:N0} تومان با کریپتو ({_wallet})&quot;);
+    }
+}
+
+// سبد خرید - Context
+public class ShoppingCart
+{
+    private readonly List&lt;(string Item, decimal Price)&gt; _items = new();
+    private IPaymentStrategy _paymentStrategy;
+
+    public void AddItem(string item, decimal price)
+    {
+        _items.Add((item, price));
+    }
+
+    public void SetPaymentStrategy(IPaymentStrategy strategy)
+    {
+        _paymentStrategy = strategy;
+    }
+
+    public void Checkout()
+    {
+        decimal total = _items.Sum(item =&gt; item.Price);
+        Console.WriteLine($&quot;\n🛒 مجموع: {total:N0} تومان&quot;);
+        
+        if (_paymentStrategy != null)
+        {
+            _paymentStrategy.Pay(total);
+        }
+        else
+        {
+            Console.WriteLine(&quot;❌ روش پرداخت انتخاب نشده&quot;);
+        }
+    }
+}
+
+// استفاده از الگو
+class Program
+{
+    static void Main()
+    {
+        ShoppingCart cart = new ShoppingCart();
+        cart.AddItem(&quot;کتاب&quot;, 50000);
+        cart.AddItem(&quot;قلم&quot;, 10000);
+
+        // تغییر استراتژی در زمان اجرا
+        cart.SetPaymentStrategy(new CreditCardStrategy(&quot;1234-5678-9012-3456&quot;));
+        cart.Checkout();
+
+        // تغییر به استراتژی دیگر
+        cart.SetPaymentStrategy(new PayPalStrategy(&quot;user@example.com&quot;));
+        cart.Checkout();
+    }
+}
+
+/* خروجی:
+🛒 مجموع: 60,000 تومان
+💳 پرداخت 60,000 تومان با کارت 1234-5678-9012-3456
+🛒 مجموع: 60,000 تومان
+🌐 پرداخت 60,000 تومان با PayPal (user@example.com)
+*/
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li><strong>انواع مختلف الگوریتم</strong>: زمانی که می‌خواهید انواع مختلف یک الگوریتم را استفاده کنید</li>
+<li><strong>رفتارهای متنوع</strong>: زمانی که کلاس‌های زیادی دارید که فقط در رفتارشان متفاوت هستند</li>
+<li><strong>جداسازی الگوریتم</strong>: زمانی که می‌خواهید الگوریتم را از کلاینت جدا کنید</li>
+<li><strong>تغییر در زمان اجرا</strong>: نیاز به تغییر رفتار در حین اجرا</li>
+</ol>
+<h2>✅ مزایا</h2>
+<ul>
+<li><strong>انعطاف‌پذیری بالا</strong>: تغییر رفتار در زمان اجرا</li>
+<li><strong>جداسازی</strong>: الگوریتم‌ها از هم و از Context جدا هستند</li>
+<li><strong>اصل Open/Closed</strong>: می‌توان استراتژی‌های جدید بدون تغییر Context اضافه کرد</li>
+<li><strong>جایگزین وراثت</strong>: استفاده از Composition به جای Inheritance</li>
+<li><strong>حذف شرط‌های متعدد</strong>: جایگزین برای if-else یا switch-case</li>
+</ul>
+<h2>❌ معایب</h2>
+<ul>
+<li><strong>تعداد کلاس‌های بیشتر</strong>: برای هر استراتژی یک کلاس جدید</li>
+<li><strong>پیچیدگی</strong>: ممکن است برای الگوریتم‌های ساده، بیش از حد پیچیده باشد</li>
+<li><strong>آگاهی کلاینت</strong>: کلاینت باید از تفاوت‌های بین استراتژی‌ها آگاه باشد</li>
+</ul>
+<h2>🎯 کاربردهای واقعی</h2>
+<ol>
+<li><strong>سیستم‌های پرداخت</strong>: انتخاب روش پرداخت مختلف</li>
+<li><strong>مرتب‌سازی</strong>: الگوریتم‌های مختلف Sort (QuickSort, MergeSort, BubbleSort)</li>
+<li><strong>فشرده‌سازی</strong>: ZIP, RAR, 7Z</li>
+<li><strong>Validation</strong>: قوانین اعتبارسنجی مختلف</li>
+<li><strong>تخفیف‌ها</strong>: محاسبه تخفیف‌های مختلف در فروشگاه</li>
+<li><strong>Navigation</strong>: الگوریتم‌های مختلف مسیریابی</li>
+</ol>
+<h2>🔑 نکات کلیدی</h2>
+<ul>
+<li>Strategy یک جایگزین عالی برای if-else و switch-case است</li>
+<li>در C# می‌توان از Delegate و Func&lt;&gt; هم استفاده کرد</li>
+<li>Context نباید از جزئیات پیاده‌سازی Strategy آگاه باشد</li>
+<li>Strategy و State شباهت دارند ولی State معمولاً Context را تغییر می‌دهد</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Strategy به شما اجازه می‌دهد الگوریتم را در زمان اجرا تغییر دهید و به راحتی استراتژی‌های جدید اضافه کنید! 🎯</p>
+</blockquote>

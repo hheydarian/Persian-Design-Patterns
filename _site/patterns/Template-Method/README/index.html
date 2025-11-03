@@ -1,0 +1,125 @@
+<h1>الگوی Template Method (متد الگو)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Template Method یک الگوی طراحی رفتاری است که اسکلت یک الگوریتم را در کلاس پایه تعریف می‌کند اما به زیرکلاس‌ها اجازه می‌دهد مراحل خاصی از الگوریتم را بدون تغییر ساختار آن بازنویسی کنند.</p>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+
+namespace TemplateMethodPattern
+{
+    // کلاس انتزاعی نوشیدنی - Template Method در اینجا قرار دارد
+    public abstract class Beverage
+    {
+        // Template Method - مراحل الگوریتم را تعریف می‌کند
+        public void Prepare()
+        {
+            BoilWater();
+            Brew();
+            PourInCup();
+            AddCondiments();
+            Console.WriteLine(&quot;✅ نوشیدنی آماده است!\n&quot;);
+        }
+
+        // متدهای مشترک که توسط کلاس پایه پیاده‌سازی شده‌اند
+        private void BoilWater()
+        {
+            Console.WriteLine(&quot;💧 جوشاندن آب&quot;);
+        }
+
+        private void PourInCup()
+        {
+            Console.WriteLine(&quot;☕ ریختن در فنجان&quot;);
+        }
+
+        // متدهای انتزاعی که باید توسط زیرکلاس‌ها پیاده‌سازی شوند
+        protected abstract void Brew();
+        protected abstract void AddCondiments();
+    }
+
+    // کلاس چای - پیاده‌سازی مشخص برای چای
+    public class Tea : Beverage
+    {
+        protected override void Brew()
+        {
+            Console.WriteLine(&quot;🍵 دم کردن چای&quot;);
+        }
+
+        protected override void AddCondiments()
+        {
+            Console.WriteLine(&quot;🍋 اضافه کردن لیمو&quot;);
+        }
+    }
+
+    // کلاس قهوه - پیاده‌سازی مشخص برای قهوه
+    public class Coffee : Beverage
+    {
+        protected override void Brew()
+        {
+            Console.WriteLine(&quot;☕ دم کردن قهوه&quot;);
+        }
+
+        protected override void AddCondiments()
+        {
+            Console.WriteLine(&quot;🥛 اضافه کردن شیر و شکر&quot;);
+        }
+    }
+
+    // برنامه اصلی
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine(&quot;📋 الگوی Template Method - آماده‌سازی نوشیدنی\n&quot;);
+            Console.WriteLine(new string('=', 60));
+
+            // آماده‌سازی چای
+            Console.WriteLine(&quot;\nآماده‌سازی چای:&quot;);
+            Console.WriteLine(new string('-', 60));
+            Beverage tea = new Tea();
+            tea.Prepare();
+
+            // آماده‌سازی قهوه
+            Console.WriteLine(&quot;آماده‌سازی قهوه:&quot;);
+            Console.WriteLine(new string('-', 60));
+            Beverage coffee = new Coffee();
+            coffee.Prepare();
+
+            Console.WriteLine(new string('=', 60));
+        }
+    }
+}
+</code></pre>
+<h3>📤 خروجی برنامه:</h3>
+<pre><code>📋 الگوی Template Method - آماده‌سازی نوشیدنی
+
+============================================================
+
+آماده‌سازی چای:
+------------------------------------------------------------
+💧 جوشاندن آب
+🍵 دم کردن چای
+☕ ریختن در فنجان
+🍋 اضافه کردن لیمو
+✅ نوشیدنی آماده است!
+
+آماده‌سازی قهوه:
+------------------------------------------------------------
+💧 جوشاندن آب
+☕ دم کردن قهوه
+☕ ریختن در فنجان
+🥛 اضافه کردن شیر و شکر
+✅ نوشیدنی آماده است!
+
+============================================================
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li>زمانی که می‌خواهید کلاینت‌ها فقط مراحل خاصی از الگوریتم را گسترش دهند</li>
+<li>زمانی که کلاس‌های متعددی دارید که الگوریتم‌های مشابهی دارند</li>
+<li>برای کنترل نقاط گسترش</li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Template Method ساختار الگوریتم را حفظ می‌کند اما جزئیات را قابل تغییر می‌سازد! 📋</p>
+</blockquote>

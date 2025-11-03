@@ -1,0 +1,323 @@
+<h1>الگوی Facade (نما / واسط)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Facade یک الگوی طراحی ساختاری است که یک رابط ساده‌شده به یک کتابخانه، فریمورک یا مجموعه پیچیده‌ای از کلاس‌ها ارائه می‌دهد.</p>
+<h2>🤔 مشکل</h2>
+<p>تصور کنید باید کد خود را با مجموعه گسترده‌ای از اشیاء متعلق به یک کتابخانه یا فریمورک پیچیده کار کنید. معمولاً باید تمام آن اشیاء را مقداردهی کنید، وابستگی‌ها را پیگیری کنید، متدها را به ترتیب صحیح اجرا کنید و غیره.</p>
+<p>در نتیجه، منطق تجاری کلاس‌های شما به شدت به جزئیات پیاده‌سازی کلاس‌های شخص ثالث وابسته می‌شود و درک و نگهداری آن را دشوار می‌کند.</p>
+<h2>💡 راه‌حل</h2>
+<p>Facade کلاسی است که یک رابط ساده به یک زیرسیستم پیچیده که شامل بسیاری از قسمت‌های متحرک است، ارائه می‌دهد. یک facade ممکن است عملکرد محدودی نسبت به کار مستقیم با زیرسیستم ارائه دهد. با این حال، فقط آن ویژگی‌هایی را شامل می‌شود که برای کلاینت‌ها واقعاً مهم هستند.</p>
+<h2>👥 شرکت‌کنندگان</h2>
+<ol>
+<li><strong>Facade</strong>: دسترسی راحت به بخش خاصی از عملکرد زیرسیستم را فراهم می‌کند</li>
+<li><strong>Complex Subsystem</strong>: زیرسیستم پیچیده با کلاس‌های متعدد</li>
+<li><strong>Client</strong>: از Facade به جای فراخوانی مستقیم اشیاء زیرسیستم استفاده می‌کند</li>
+</ol>
+<h2>⚖️ پیامدها</h2>
+<h3>مزایا ✅</h3>
+<ul>
+<li><strong>ساده‌سازی</strong>: کد شما را از پیچیدگی زیرسیستم جدا می‌کند</li>
+<li><strong>جفت‌شدگی سست (Loose Coupling)</strong>: وابستگی کمتری به زیرسیستم پیچیده</li>
+<li><strong>نقطه ورود واحد</strong>: یک نقطه ورود به زیرسیستم</li>
+</ul>
+<h3>معایب ❌</h3>
+<ul>
+<li>Facade می‌تواند به یک شیء خدای (God Object) وابسته به تمام کلاس‌های برنامه تبدیل شود</li>
+</ul>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+
+namespace FacadePattern
+{
+    // زیرسیستم پیچیده - سینمای خانگی
+
+    // کلاس آمپلی‌فایر
+    public class Amplifier
+    {
+        public void On()
+        {
+            Console.WriteLine(&quot;🔊 آمپلی‌فایر روشن شد&quot;);
+        }
+
+        public void Off()
+        {
+            Console.WriteLine(&quot;🔊 آمپلی‌فایر خاموش شد&quot;);
+        }
+
+        public void SetVolume(int level)
+        {
+            Console.WriteLine($&quot;🔊 تنظیم صدا روی {level}&quot;);
+        }
+    }
+
+    // کلاس پخش‌کننده DVD
+    public class DVDPlayer
+    {
+        public void On()
+        {
+            Console.WriteLine(&quot;📀 پخش‌کننده DVD روشن شد&quot;);
+        }
+
+        public void Off()
+        {
+            Console.WriteLine(&quot;📀 پخش‌کننده DVD خاموش شد&quot;);
+        }
+
+        public void Play(string movie)
+        {
+            Console.WriteLine($&quot;📀 پخش فیلم: {movie}&quot;);
+        }
+
+        public void Stop()
+        {
+            Console.WriteLine(&quot;📀 توقف پخش&quot;);
+        }
+    }
+
+    // کلاس پروژکتور
+    public class Projector
+    {
+        public void On()
+        {
+            Console.WriteLine(&quot;📽️ پروژکتور روشن شد&quot;);
+        }
+
+        public void Off()
+        {
+            Console.WriteLine(&quot;📽️ پروژکتور خاموش شد&quot;);
+        }
+
+        public void WideScreenMode()
+        {
+            Console.WriteLine(&quot;📽️ حالت صفحه وسیع فعال شد&quot;);
+        }
+    }
+
+    // کلاس نورپردازی
+    public class Lights
+    {
+        public void Dim(int level)
+        {
+            Console.WriteLine($&quot;💡 نور کم شد به {level}%&quot;);
+        }
+
+        public void On()
+        {
+            Console.WriteLine(&quot;💡 نور روشن شد&quot;);
+        }
+    }
+
+    // کلاس پرده
+    public class Screen
+    {
+        public void Down()
+        {
+            Console.WriteLine(&quot;🎬 پرده پایین آمد&quot;);
+        }
+
+        public void Up()
+        {
+            Console.WriteLine(&quot;🎬 پرده بالا رفت&quot;);
+        }
+    }
+
+    // کلاس سیستم صوتی
+    public class SoundSystem
+    {
+        public void On()
+        {
+            Console.WriteLine(&quot;🎵 سیستم صوتی روشن شد&quot;);
+        }
+
+        public void Off()
+        {
+            Console.WriteLine(&quot;🎵 سیستم صوتی خاموش شد&quot;);
+        }
+
+        public void SetSurroundSound()
+        {
+            Console.WriteLine(&quot;🎵 صدای فراگیر فعال شد&quot;);
+        }
+    }
+
+    // Facade - رابط ساده‌شده
+    public class HomeTheaterFacade
+    {
+        private readonly Amplifier _amplifier;
+        private readonly DVDPlayer _dvdPlayer;
+        private readonly Projector _projector;
+        private readonly Lights _lights;
+        private readonly Screen _screen;
+        private readonly SoundSystem _soundSystem;
+
+        public HomeTheaterFacade()
+        {
+            _amplifier = new Amplifier();
+            _dvdPlayer = new DVDPlayer();
+            _projector = new Projector();
+            _lights = new Lights();
+            _screen = new Screen();
+            _soundSystem = new SoundSystem();
+        }
+
+        public void WatchMovie(string movie)
+        {
+            Console.WriteLine(&quot;\n🎬 آماده‌سازی برای تماشای فیلم...\n&quot;);
+            _lights.Dim(10);
+            _screen.Down();
+            _projector.On();
+            _projector.WideScreenMode();
+            _amplifier.On();
+            _amplifier.SetVolume(5);
+            _soundSystem.On();
+            _soundSystem.SetSurroundSound();
+            _dvdPlayer.On();
+            _dvdPlayer.Play(movie);
+            Console.WriteLine(&quot;\n✅ همه چیز آماده است! لذت ببرید! 🍿\n&quot;);
+        }
+
+        public void EndMovie()
+        {
+            Console.WriteLine(&quot;\n🛑 خاموش کردن سینمای خانگی...\n&quot;);
+            _dvdPlayer.Stop();
+            _dvdPlayer.Off();
+            _soundSystem.Off();
+            _amplifier.Off();
+            _projector.Off();
+            _screen.Up();
+            _lights.On();
+            Console.WriteLine(&quot;\n✅ همه چیز خاموش شد. خوش گذشت! 👋\n&quot;);
+        }
+    }
+
+    // برنامه اصلی
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine(&quot;🏠 الگوی Facade - سینمای خانگی&quot;);
+            Console.WriteLine(new string('=', 60));
+
+            HomeTheaterFacade homeTheater = new HomeTheaterFacade();
+
+            // تماشای فیلم
+            homeTheater.WatchMovie(&quot;مردانی که زنی را دوست داشتند&quot;);
+
+            Console.WriteLine(&quot;\nبرای پایان فیلم Enter را فشار دهید...&quot;);
+            Console.ReadLine();
+
+            // پایان فیلم
+            homeTheater.EndMovie();
+
+            Console.WriteLine(new string('=', 60));
+        }
+    }
+}
+</code></pre>
+<h2>🎯 مثال کاربردی واقعی</h2>
+<h3>مثال 1: سیستم سفارش آنلاین</h3>
+<pre><code class="language-csharp">using System;
+
+namespace FacadePattern.RealWorld
+{
+    // کلاس‌های زیرسیستم
+    public class Inventory
+    {
+        public bool CheckStock(string productId)
+        {
+            Console.WriteLine($&quot;📦 بررسی موجودی محصول {productId}&quot;);
+            return true;
+        }
+    }
+
+    public class Payment
+    {
+        public bool ProcessPayment(decimal amount)
+        {
+            Console.WriteLine($&quot;💳 پردازش پرداخت {amount:N0} تومان&quot;);
+            return true;
+        }
+    }
+
+    public class Shipping
+    {
+        public void ArrangeShipping(string address)
+        {
+            Console.WriteLine($&quot;🚚 ترتیب ارسال به آدرس: {address}&quot;);
+        }
+    }
+
+    public class Notification
+    {
+        public void SendConfirmation(string email)
+        {
+            Console.WriteLine($&quot;📧 ارسال ایمیل تایید به {email}&quot;);
+        }
+    }
+
+    // Facade - رابط ساده برای سیستم سفارش
+    public class OrderFacade
+    {
+        private readonly Inventory _inventory;
+        private readonly Payment _payment;
+        private readonly Shipping _shipping;
+        private readonly Notification _notification;
+
+        public OrderFacade()
+        {
+            _inventory = new Inventory();
+            _payment = new Payment();
+            _shipping = new Shipping();
+            _notification = new Notification();
+        }
+
+        public bool PlaceOrder(string productId, decimal amount, 
+                              string address, string email)
+        {
+            Console.WriteLine(&quot;\n🛒 شروع فرآیند سفارش...\n&quot;);
+
+            if (!_inventory.CheckStock(productId))
+            {
+                Console.WriteLine(&quot;❌ محصول موجود نیست&quot;);
+                return false;
+            }
+
+            if (!_payment.ProcessPayment(amount))
+            {
+                Console.WriteLine(&quot;❌ پرداخت ناموفق&quot;);
+                return false;
+            }
+
+            _shipping.ArrangeShipping(address);
+            _notification.SendConfirmation(email);
+
+            Console.WriteLine(&quot;\n✅ سفارش با موفقیت ثبت شد!\n&quot;);
+            return true;
+        }
+    }
+
+    // استفاده
+    class OrderDemo
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            OrderFacade orderSystem = new OrderFacade();
+            orderSystem.PlaceOrder(&quot;P123&quot;, 150000, 
+                &quot;تهران، خیابان ولیعصر&quot;, &quot;user@example.com&quot;);
+        }
+    }
+}
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li><strong>زمانی که نیاز به رابط ساده به زیرسیستم پیچیده دارید</strong></li>
+<li><strong>زمانی که می‌خواهید زیرسیستم را لایه‌بندی کنید</strong></li>
+<li><strong>زمانی که می‌خواهید وابستگی به زیرسیستم را کاهش دهید</strong></li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Facade پیچیدگی را پنهان می‌کند و رابط ساده ارائه می‌دهد! 🏛️</p>
+</blockquote>

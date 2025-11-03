@@ -1,0 +1,433 @@
+<h1>الگوی Decorator (تزئین‌کننده / دکوراتور)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Decorator یک الگوی طراحی ساختاری است که به شما اجازه می‌دهد رفتارهای جدیدی به اشیاء با قرار دادن آن‌ها در اشیاء wrapper ویژه که شامل رفتارها هستند، اضافه کنید.</p>
+<h2>🤔 مشکل</h2>
+<p>تصور کنید روی یک کتابخانه اطلاع‌رسانی کار می‌کنید که به برنامه‌ها اجازه می‌دهد کاربران را از رویدادهای مهم مطلع کنند.</p>
+<p>نسخه اولیه کتابخانه بر اساس کلاس <code>Notifier</code> بود که فقط چند فیلد، یک سازنده و یک متد <code>send</code> داشت. این متد می‌توانست یک پیام از کلاینت دریافت کند و پیام را به لیستی از ایمیل‌ها ارسال کند.</p>
+<p>در یک مقطع، متوجه می‌شوید که کاربران کتابخانه انتظار بیش از فقط اطلاع‌رسانی ایمیل را دارند. بسیاری از آن‌ها می‌خواهند در مورد مسائل حیاتی از طریق پیامک دریافت کنند. برخی دیگر می‌خواهند از طریق فیسبوک مطلع شوند و کاربران شرکتی می‌خواهند اعلان‌های Slack دریافت کنند.</p>
+<h2>💡 راه‌حل</h2>
+<p>گسترش یک کلاس اولین چیزی است که به ذهن می‌رسد زمانی که نیاز به تغییر رفتار یک شیء دارید. با این حال، وراثت چندین محدودیت جدی دارد که باید از آن‌ها آگاه باشید.</p>
+<p>یکی از راه‌های غلبه بر این محدودیت‌ها استفاده از Aggregation یا Composition به جای Inheritance است. هر دو جایگزین تقریباً یکسان کار می‌کنند: یک شیء رفرنسی به شیء دیگر دارد و کار را به آن واگذار می‌کند، در حالی که با وراثت، خود شیء می‌تواند آن کار را انجام دهد و رفتار را از کلاس والد به ارث ببرد.</p>
+<h2>🏗️ ساختار</h2>
+<pre><code>              ┌─────────────┐
+              │  Component  │ (Interface)
+              ├─────────────┤
+              │ + operation()│
+              └─────────────┘
+                     △
+                     │ implements
+        ┌────────────┴────────────┐
+        │                         │
+  ┌──────────────┐        ┌──────────────┐
+  │   Concrete   │        │   Decorator  │
+  │  Component   │        │   (Abstract) │
+  ├──────────────┤        ├──────────────┤
+  │+ operation() │        │ - component  │
+  └──────────────┘        │+ operation() │
+                          └──────────────┘
+                                 △
+                                 │
+                    ┌────────────┴────────────┐
+                    │                         │
+            ┌─────────────────┐      ┌─────────────────┐
+            │ConcreteDecorator│      │ConcreteDecorator│
+            │       A         │      │       B         │
+            ├─────────────────┤      ├─────────────────┤
+            │+ operation()    │      │+ operation()    │
+            │+ extraBehavior()│      │+ extraBehavior()│
+            └─────────────────┘      └─────────────────┘
+</code></pre>
+<h2>👥 شرکت‌کنندگان</h2>
+<ol>
+<li><strong>Component</strong>: رابط مشترک برای wrappers و اشیاء wrapped</li>
+<li><strong>ConcreteComponent</strong>: کلاس اشیاءی که wrapped می‌شوند</li>
+<li><strong>Decorator</strong>: کلاس پایه برای تمام decorators</li>
+<li><strong>ConcreteDecorator</strong>: decorators مشخص که رفتارهای اضافی را اضافه می‌کنند</li>
+</ol>
+<h2>⚖️ پیامدها</h2>
+<h3>مزایا ✅</h3>
+<ul>
+<li><strong>انعطاف‌پذیری بیشتر</strong>: می‌توانید رفتارهای جدید بدون ایجاد زیرکلاس‌های جدید اضافه کنید</li>
+<li><strong>مسئولیت‌های تقسیم شده</strong>: می‌توانید چندین رفتار را با wrapping کردن شیء در چندین decorator اضافه کنید</li>
+<li><strong>ترکیب‌پذیری</strong>: می‌توانید decorators را با هم ترکیب کنید</li>
+<li><strong>اصل تک مسئولیتی</strong>: می‌توانید رفتار را بین چندین کلاس کوچک تقسیم کنید</li>
+</ul>
+<h3>معایب ❌</h3>
+<ul>
+<li>حذف یک wrapper خاص از پشته wrapper سخت است</li>
+<li>سخت است که decorator را طوری پیاده‌سازی کنید که رفتارش به ترتیب decorators در پشته وابسته نباشد</li>
+</ul>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+
+namespace DecoratorPattern
+{
+    // Component Interface - رابط اصلی قهوه
+    public interface ICoffee
+    {
+        // محاسبه قیمت قهوه
+        double Cost();
+        
+        // توضیحات قهوه
+        string Description();
+    }
+
+    // Concrete Component - قهوه ساده پایه
+    public class SimpleCoffee : ICoffee
+    {
+        public double Cost()
+        {
+            return 5000; // 5000 تومان
+        }
+
+        public string Description()
+        {
+            return &quot;قهوه ساده&quot;;
+        }
+    }
+
+    // Decorator Base - کلاس پایه دکوراتور
+    public abstract class CoffeeDecorator : ICoffee
+    {
+        protected ICoffee _coffee;
+
+        public CoffeeDecorator(ICoffee coffee)
+        {
+            _coffee = coffee;
+        }
+
+        public virtual double Cost()
+        {
+            return _coffee.Cost();
+        }
+
+        public virtual string Description()
+        {
+            return _coffee.Description();
+        }
+    }
+
+    // Concrete Decorator - دکوراتور شیر
+    public class MilkDecorator : CoffeeDecorator
+    {
+        public MilkDecorator(ICoffee coffee) : base(coffee) { }
+
+        public override double Cost()
+        {
+            return _coffee.Cost() + 1000; // اضافه کردن 1000 تومان
+        }
+
+        public override string Description()
+        {
+            return _coffee.Description() + &quot; + شیر 🥛&quot;;
+        }
+    }
+
+    // Concrete Decorator - دکوراتور شکر
+    public class SugarDecorator : CoffeeDecorator
+    {
+        public SugarDecorator(ICoffee coffee) : base(coffee) { }
+
+        public override double Cost()
+        {
+            return _coffee.Cost() + 500; // اضافه کردن 500 تومان
+        }
+
+        public override string Description()
+        {
+            return _coffee.Description() + &quot; + شکر 🧂&quot;;
+        }
+    }
+
+    // Concrete Decorator - دکوراتور خامه
+    public class WhippedCreamDecorator : CoffeeDecorator
+    {
+        public WhippedCreamDecorator(ICoffee coffee) : base(coffee) { }
+
+        public override double Cost()
+        {
+            return _coffee.Cost() + 2000; // اضافه کردن 2000 تومان
+        }
+
+        public override string Description()
+        {
+            return _coffee.Description() + &quot; + خامه ☁️&quot;;
+        }
+    }
+
+    // Concrete Decorator - دکوراتور کارامل
+    public class CaramelDecorator : CoffeeDecorator
+    {
+        public CaramelDecorator(ICoffee coffee) : base(coffee) { }
+
+        public override double Cost()
+        {
+            return _coffee.Cost() + 1500; // اضافه کردن 1500 تومان
+        }
+
+        public override string Description()
+        {
+            return _coffee.Description() + &quot; + کارامل 🍯&quot;;
+        }
+    }
+
+    // Concrete Decorator - دکوراتور وانیل
+    public class VanillaDecorator : CoffeeDecorator
+    {
+        public VanillaDecorator(ICoffee coffee) : base(coffee) { }
+
+        public override double Cost()
+        {
+            return _coffee.Cost() + 1200; // اضافه کردن 1200 تومان
+        }
+
+        public override string Description()
+        {
+            return _coffee.Description() + &quot; + وانیل 🌼&quot;;
+        }
+    }
+
+    // برنامه اصلی
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // تنظیم کدگذاری برای نمایش صحیح فارسی و ایموجی‌ها
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine(&quot;☕ الگوی Decorator - سفارش قهوه\n&quot;);
+            Console.WriteLine(new string('=', 60));
+
+            // 1️⃣ قهوه ساده
+            Console.WriteLine(&quot;\n1️⃣ قهوه ساده:&quot;);
+            Console.WriteLine(new string('-', 60));
+            ICoffee coffee1 = new SimpleCoffee();
+            Console.WriteLine(coffee1.Description());
+            Console.WriteLine($&quot;💰 قیمت: {coffee1.Cost():N0} تومان&quot;);
+
+            // 2️⃣ قهوه با شیر
+            Console.WriteLine(&quot;\n2️⃣ قهوه با شیر:&quot;);
+            Console.WriteLine(new string('-', 60));
+            ICoffee coffee2 = new SimpleCoffee();
+            coffee2 = new MilkDecorator(coffee2);
+            Console.WriteLine(coffee2.Description());
+            Console.WriteLine($&quot;💰 قیمت: {coffee2.Cost():N0} تومان&quot;);
+
+            // 3️⃣ قهوه با شیر و شکر
+            Console.WriteLine(&quot;\n3️⃣ قهوه با شیر و شکر:&quot;);
+            Console.WriteLine(new string('-', 60));
+            ICoffee coffee3 = new SimpleCoffee();
+            coffee3 = new MilkDecorator(coffee3);
+            coffee3 = new SugarDecorator(coffee3);
+            Console.WriteLine(coffee3.Description());
+            Console.WriteLine($&quot;💰 قیمت: {coffee3.Cost():N0} تومان&quot;);
+
+            // 4️⃣ قهوه ویژه (با همه افزودنی‌ها)
+            Console.WriteLine(&quot;\n4️⃣ قهوه ویژه (با همه افزودنی‌ها):&quot;);
+            Console.WriteLine(new string('-', 60));
+            ICoffee coffee4 = new SimpleCoffee();
+            coffee4 = new MilkDecorator(coffee4);
+            coffee4 = new SugarDecorator(coffee4);
+            coffee4 = new WhippedCreamDecorator(coffee4);
+            coffee4 = new CaramelDecorator(coffee4);
+            coffee4 = new VanillaDecorator(coffee4);
+            Console.WriteLine(coffee4.Description());
+            Console.WriteLine($&quot;💰 قیمت: {coffee4.Cost():N0} تومان&quot;);
+
+            // 5️⃣ کاپوچینو (شیر + خامه)
+            Console.WriteLine(&quot;\n5️⃣ کاپوچینو:&quot;);
+            Console.WriteLine(new string('-', 60));
+            ICoffee coffee5 = new SimpleCoffee();
+            coffee5 = new MilkDecorator(coffee5);
+            coffee5 = new WhippedCreamDecorator(coffee5);
+            Console.WriteLine(coffee5.Description());
+            Console.WriteLine($&quot;💰 قیمت: {coffee5.Cost():N0} تومان&quot;);
+
+            Console.WriteLine(&quot;\n&quot; + new string('=', 60));
+        }
+    }
+}
+</code></pre>
+<h3>📤 خروجی برنامه:</h3>
+<pre><code>☕ الگوی Decorator - سفارش قهوه
+
+============================================================
+
+1️⃣ قهوه ساده:
+------------------------------------------------------------
+قهوه ساده
+💰 قیمت: 5,000 تومان
+
+2️⃣ قهوه با شیر:
+------------------------------------------------------------
+قهوه ساده + شیر 🥛
+💰 قیمت: 6,000 تومان
+
+3️⃣ قهوه با شیر و شکر:
+------------------------------------------------------------
+قهوه ساده + شیر 🥛 + شکر 🧂
+💰 قیمت: 6,500 تومان
+
+4️⃣ قهوه ویژه (با همه افزودنی‌ها):
+------------------------------------------------------------
+قهوه ساده + شیر 🥛 + شکر 🧂 + خامه ☁️ + کارامل 🍯 + وانیل 🌼
+💰 قیمت: 11,200 تومان
+
+5️⃣ کاپوچینو:
+------------------------------------------------------------
+قهوه ساده + شیر 🥛 + خامه ☁️
+💰 قیمت: 8,000 تومان
+
+============================================================
+</code></pre>
+<h2>🎯 مثال کاربردی واقعی</h2>
+<h3>مثال 1: فشرده‌سازی و رمزنگاری داده</h3>
+<pre><code class="language-csharp">using System;
+
+namespace DecoratorPattern.RealWorld
+{
+    // رابط منبع داده
+    public interface IDataSource
+    {
+        void WriteData(string data);
+        string ReadData();
+    }
+
+    // منبع داده فایل - Component اصلی
+    public class FileDataSource : IDataSource
+    {
+        private string _filename;
+        private string _data;
+
+        public FileDataSource(string filename)
+        {
+            _filename = filename;
+            _data = &quot;&quot;;
+        }
+
+        public void WriteData(string data)
+        {
+            _data = data;
+            Console.WriteLine($&quot;💾 نوشتن داده در فایل {_filename}&quot;);
+        }
+
+        public string ReadData()
+        {
+            Console.WriteLine($&quot;📖 خواندن داده از فایل {_filename}&quot;);
+            return _data;
+        }
+    }
+
+    // دکوراتور فشرده‌سازی
+    public class CompressionDecorator : IDataSource
+    {
+        private IDataSource _source;
+
+        public CompressionDecorator(IDataSource source)
+        {
+            _source = source;
+        }
+
+        public void WriteData(string data)
+        {
+            string compressed = $&quot;[فشرده‌شده: {data}]&quot;;
+            Console.WriteLine(&quot;🗜️ فشرده‌سازی داده...&quot;);
+            _source.WriteData(compressed);
+        }
+
+        public string ReadData()
+        {
+            string data = _source.ReadData();
+            Console.WriteLine(&quot;📦 باز کردن فشرده‌سازی...&quot;);
+            return data.Replace(&quot;[فشرده‌شده: &quot;, &quot;&quot;).Replace(&quot;]&quot;, &quot;&quot;);
+        }
+    }
+
+    // دکوراتور رمزنگاری
+    public class EncryptionDecorator : IDataSource
+    {
+        private IDataSource _source;
+
+        public EncryptionDecorator(IDataSource source)
+        {
+            _source = source;
+        }
+
+        public void WriteData(string data)
+        {
+            string encrypted = $&quot;[رمزنگاری‌شده: {data}]&quot;;
+            Console.WriteLine(&quot;🔒 رمزنگاری داده...&quot;);
+            _source.WriteData(encrypted);
+        }
+
+        public string ReadData()
+        {
+            string data = _source.ReadData();
+            Console.WriteLine(&quot;🔓 رمزگشایی داده...&quot;);
+            return data.Replace(&quot;[رمزنگاری‌شده: &quot;, &quot;&quot;).Replace(&quot;]&quot;, &quot;&quot;);
+        }
+    }
+
+    // استفاده از الگو
+    class DataExample
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            
+            Console.WriteLine(&quot;🔐 مثال فشرده‌سازی و رمزنگاری داده\n&quot;);
+            Console.WriteLine(new string('=', 60));
+
+            // ایجاد منبع داده فایل
+            IDataSource file = new FileDataSource(&quot;data.txt&quot;);
+            
+            // اضافه کردن لایه رمزنگاری
+            IDataSource encryptedFile = new EncryptionDecorator(file);
+            
+            // اضافه کردن لایه فشرده‌سازی
+            IDataSource compressedEncrypted = new CompressionDecorator(encryptedFile);
+
+            Console.WriteLine(&quot;\n📝 نوشتن داده:&quot;);
+            Console.WriteLine(new string('-', 60));
+            compressedEncrypted.WriteData(&quot;داده مهم&quot;);
+
+            Console.WriteLine(&quot;\n📖 خواندن داده:&quot;);
+            Console.WriteLine(new string('-', 60));
+            string result = compressedEncrypted.ReadData();
+            Console.WriteLine($&quot;✅ داده نهایی: {result}&quot;);
+            
+            Console.WriteLine(&quot;\n&quot; + new string('=', 60));
+        }
+    }
+}
+</code></pre>
+<h3>📤 خروجی مثال فشرده‌سازی:</h3>
+<pre><code>🔐 مثال فشرده‌سازی و رمزنگاری داده
+
+============================================================
+
+📝 نوشتن داده:
+------------------------------------------------------------
+🗜️ فشرده‌سازی داده...
+🔒 رمزنگاری داده...
+💾 نوشتن داده در فایل data.txt
+
+📖 خواندن داده:
+------------------------------------------------------------
+📖 خواندن داده از فایل data.txt
+🔓 رمزگشایی داده...
+📦 باز کردن فشرده‌سازی...
+✅ داده نهایی: داده مهم
+
+============================================================
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li><strong>زمانی که می‌خواهید مسئولیت‌های اضافی به اشیاء اضافه کنید بدون اینکه کد را تغییر دهید</strong></li>
+<li><strong>زمانی که استفاده از وراثت غیرعملی یا غیرممکن است</strong></li>
+<li><strong>زمانی که می‌خواهید رفتارها را به صورت پویا اضافه/حذف کنید</strong></li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Decorator به شما اجازه می‌دهد رفتارها را لایه به لایه اضافه کنید! 🎁</p>
+</blockquote>

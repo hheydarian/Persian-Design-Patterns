@@ -1,0 +1,324 @@
+<h1>👷 الگوی سازنده (Builder)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی <strong>Builder</strong> یک الگوی طراحی سازنده (Creational) است که به شما امکان می‌دهد <strong>اشیاء پیچیده را گام به گام بسازید</strong>. این الگو به شما اجازه می‌دهد انواع و نمایش‌های مختلف یک شیء را با استفاده از همان کد ساخت تولید کنید.</p>
+<p>به عبارت ساده‌تر، Builder مانند یک <strong>دستورالعمل ساخت قدم به قدم</strong> است که به شما کمک می‌کند اشیاء پیچیده را به روشی منظم و خوانا بسازید، بدون اینکه نگران پیچیدگی سازنده‌ها (constructors) با پارامترهای زیاد باشید.</p>
+<h2>🤔 مشکل</h2>
+<p>تصور کنید می‌خواهید یک شیء پیچیده مثل <code>Computer</code> بسازید که ویژگی‌های زیادی دارد:</p>
+<ul>
+<li>CPU (پردازنده)</li>
+<li>RAM (حافظه)</li>
+<li>Storage (حافظه ذخیره‌سازی)</li>
+<li>GPU (کارت گرافیک)</li>
+<li>Motherboard (مادربرد)</li>
+<li>PowerSupply (منبع تغذیه)</li>
+<li>و غیره...</li>
+</ul>
+<h3>مشکلات رویکرد سنتی:</h3>
+<p><strong>1. سازنده با پارامترهای زیاد (Telescoping Constructor)</strong></p>
+<pre><code class="language-csharp">// خیلی طولانی و گیج‌کننده!
+var computer = new Computer(&quot;Intel i9&quot;, &quot;32GB&quot;, &quot;1TB SSD&quot;, &quot;RTX 4090&quot;, &quot;ASUS&quot;, &quot;850W&quot;, ...);
+</code></pre>
+<p>مشکلات:</p>
+<ul>
+<li>نمی‌دانیم هر پارامتر چیست</li>
+<li>ترتیب پارامترها را باید به خاطر بسپاریم</li>
+<li>پارامترهای اختیاری را باید null بدهیم</li>
+</ul>
+<p><strong>2. سازنده‌های متعدد (Multiple Constructors)</strong></p>
+<pre><code class="language-csharp">public Computer(string cpu, string ram) { }
+public Computer(string cpu, string ram, string storage) { }
+public Computer(string cpu, string ram, string storage, string gpu) { }
+// و ده‌ها سازنده دیگر...
+</code></pre>
+<p>مشکلات:</p>
+<ul>
+<li>تعداد سازنده‌ها انفجاری می‌شود</li>
+<li>کد تکراری زیاد</li>
+<li>نگهداری سخت</li>
+</ul>
+<p><strong>3. استفاده از Setter ها</strong></p>
+<pre><code class="language-csharp">var computer = new Computer();
+computer.CPU = &quot;Intel i9&quot;;
+computer.RAM = &quot;32GB&quot;;
+// ممکن است فراموش کنیم یکی را set کنیم!
+</code></pre>
+<p>مشکلات:</p>
+<ul>
+<li>شیء در حالت ناقص قابل استفاده است</li>
+<li>خطاهای runtime</li>
+<li>thread-safe نیست</li>
+</ul>
+<h2>💡 راه‌حل</h2>
+<p>الگوی Builder این مشکلات را حل می‌کند با:</p>
+<ol>
+<li><strong>جداسازی کد ساخت</strong>: منطق ساخت را از کلاس اصلی جدا می‌کند</li>
+<li><strong>ساخت گام به گام</strong>: می‌توانید فقط مراحلی که نیاز دارید را اجرا کنید</li>
+<li><strong>خوانایی بالا</strong>: کد واضح و قابل فهم است</li>
+<li><strong>انعطاف‌پذیری</strong>: می‌توانید Builder های مختلف برای ساخت‌های مختلف داشته باشید</li>
+</ol>
+<h2>💻 پیاده‌سازی با C#</h2>
+<h3>روش اول: Fluent Builder (پیشنهادی)</h3>
+<pre><code class="language-csharp">// محصول - Product
+public class Computer
+{
+    public string CPU { get; set; }
+    public string RAM { get; set; }
+    public string Storage { get; set; }
+    public string GPU { get; set; }
+
+    public void Display() =&gt; 
+        Console.WriteLine($&quot;💻 کامپیوتر: CPU={CPU}, RAM={RAM}, Storage={Storage}, GPU={GPU}&quot;);
+}
+
+// رابط Builder
+public interface IComputerBuilder
+{
+    IComputerBuilder SetCPU(string cpu);
+    IComputerBuilder SetRAM(string ram);
+    IComputerBuilder SetStorage(string storage);
+    IComputerBuilder SetGPU(string gpu);
+    Computer Build();
+}
+
+// Concrete Builder برای کامپیوتر گیمینگ
+public class GamingComputerBuilder : IComputerBuilder
+{
+    private readonly Computer _computer = new();
+
+    public IComputerBuilder SetCPU(string cpu)
+    {
+        _computer.CPU = cpu;
+        return this;
+    }
+
+    public IComputerBuilder SetRAM(string ram)
+    {
+        _computer.RAM = ram;
+        return this;
+    }
+
+    public IComputerBuilder SetStorage(string storage)
+    {
+        _computer.Storage = storage;
+        return this;
+    }
+
+    public IComputerBuilder SetGPU(string gpu)
+    {
+        _computer.GPU = gpu;
+        return this;
+    }
+
+    public Computer Build() =&gt; _computer;
+}
+
+// استفاده - Method Chaining (Fluent Interface)
+var gamingPC = new GamingComputerBuilder()
+    .SetCPU(&quot;Intel i9-13900K&quot;)
+    .SetRAM(&quot;32GB DDR5&quot;)
+    .SetStorage(&quot;2TB NVMe SSD&quot;)
+    .SetGPU(&quot;RTX 4090&quot;)
+    .Build();
+
+gamingPC.Display();
+// خروجی: 💻 کامپیوتر: CPU=Intel i9-13900K, RAM=32GB DDR5, Storage=2TB NVMe SSD, GPU=RTX 4090
+</code></pre>
+<h3>روش دوم: با Director (هماهنگ‌کننده)</h3>
+<pre><code class="language-csharp">// Concrete Builder برای کامپیوتر اداری
+public class OfficeComputerBuilder : IComputerBuilder
+{
+    private readonly Computer _computer = new();
+
+    public IComputerBuilder SetCPU(string cpu)
+    {
+        _computer.CPU = cpu;
+        return this;
+    }
+
+    public IComputerBuilder SetRAM(string ram)
+    {
+        _computer.RAM = ram;
+        return this;
+    }
+
+    public IComputerBuilder SetStorage(string storage)
+    {
+        _computer.Storage = storage;
+        return this;
+    }
+
+    public IComputerBuilder SetGPU(string gpu)
+    {
+        _computer.GPU = gpu;
+        return this;
+    }
+
+    public Computer Build() =&gt; _computer;
+}
+
+// Director - مدیریت مراحل ساخت از پیش تعریف شده
+public class ComputerDirector
+{
+    private IComputerBuilder _builder;
+
+    public ComputerDirector(IComputerBuilder builder)
+    {
+        _builder = builder;
+    }
+
+    public void ChangeBuilder(IComputerBuilder builder) =&gt; _builder = builder;
+
+    public Computer MakeGamingPC()
+    {
+        return _builder
+            .SetCPU(&quot;Intel i9-13900K&quot;)
+            .SetRAM(&quot;32GB DDR5&quot;)
+            .SetStorage(&quot;2TB NVMe SSD&quot;)
+            .SetGPU(&quot;RTX 4090&quot;)
+            .Build();
+    }
+
+    public Computer MakeOfficePC()
+    {
+        return _builder
+            .SetCPU(&quot;Intel i5-12400&quot;)
+            .SetRAM(&quot;16GB DDR4&quot;)
+            .SetStorage(&quot;512GB SSD&quot;)
+            .SetGPU(&quot;Intel UHD 730&quot;)
+            .Build();
+    }
+}
+
+// استفاده از Director
+var director = new ComputerDirector(new GamingComputerBuilder());
+
+var gaming = director.MakeGamingPC();
+gaming.Display();
+
+director.ChangeBuilder(new OfficeComputerBuilder());
+var office = director.MakeOfficePC();
+office.Display();
+</code></pre>
+<h2>🎯 مثال کاربردی: سازنده پیام ایمیل</h2>
+<pre><code class="language-csharp">public class Email
+{
+    public string To { get; set; }
+    public string Subject { get; set; }
+    public string Body { get; set; }
+    public List&lt;string&gt; Attachments { get; set; } = new();
+    
+    public void Send() =&gt; 
+        Console.WriteLine($&quot;📧 ایمیل به {To} با موضوع '{Subject}' ارسال شد&quot;);
+}
+
+public class EmailBuilder
+{
+    private readonly Email _email = new();
+
+    public EmailBuilder To(string address)
+    {
+        _email.To = address;
+        return this;
+    }
+
+    public EmailBuilder Subject(string subject)
+    {
+        _email.Subject = subject;
+        return this;
+    }
+
+    public EmailBuilder Body(string body)
+    {
+        _email.Body = body;
+        return this;
+    }
+
+    public EmailBuilder Attach(string file)
+    {
+        _email.Attachments.Add(file);
+        return this;
+    }
+
+    public Email Build() =&gt; _email;
+}
+
+// استفاده
+var email = new EmailBuilder()
+    .To(&quot;user@example.com&quot;)
+    .Subject(&quot;گزارش ماهانه&quot;)
+    .Body(&quot;متن گزارش...&quot;)
+    .Attach(&quot;report.pdf&quot;)
+    .Attach(&quot;chart.png&quot;)
+    .Build();
+
+email.Send();
+</code></pre>
+<h2>⚖️ مزایا و معایب</h2>
+<h3>مزایا ✅</h3>
+<ol>
+<li><strong>خوانایی کد بالا</strong>: کد خیلی واضح و قابل فهم است</li>
+<li><strong>کنترل بیشتر روی فرآیند ساخت</strong>: می‌توانید هر مرحله را جداگانه کنترل کنید</li>
+<li><strong>استفاده مجدد از کد</strong>: Builder ها قابل استفاده مجدد هستند</li>
+<li><strong>اصل تک مسئولیتی</strong>: کد ساخت از منطق کسب‌وکار جدا است</li>
+<li><strong>ساخت اشیاء پیچیده</strong>: برای اشیاء با پیکربندی پیچیده ایده‌آل است</li>
+<li><strong>عدم نیاز به Telescoping Constructor</strong>: از سازنده‌های طولانی خلاص می‌شوید</li>
+<li><strong>Immutability</strong>: می‌توان اشیاء immutable ساخت</li>
+</ol>
+<h3>معایب ❌</h3>
+<ol>
+<li><strong>افزایش تعداد کلاس‌ها</strong>: برای هر نوع محصول یک Builder نیاز است</li>
+<li><strong>پیچیدگی کد</strong>: برای اشیاء ساده، بیش از حد پیچیده است</li>
+<li><strong>کد بیشتر</strong>: نسبت به سازنده معمولی، کد بیشتری نیاز دارد</li>
+</ol>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<h3>✅ استفاده کنید وقتی:</h3>
+<ol>
+<li><strong>پارامترهای زیاد</strong>: شیء شما پارامترهای زیادی دارد (بیشتر از 4-5 تا)</li>
+<li><strong>پارامترهای اختیاری</strong>: بسیاری از پارامترها اختیاری هستند</li>
+<li><strong>ساخت پیچیده</strong>: فرآیند ساخت چندین مرحله دارد</li>
+<li><strong>نمایش‌های مختلف</strong>: می‌خواهید نمایش‌های مختلف یک شیء بسازید</li>
+<li><strong>Fluent Interface</strong>: می‌خواهید API خوانا و روان داشته باشید</li>
+<li><strong>اشیاء Immutable</strong>: می‌خواهید اشیاء غیرقابل تغییر بسازید</li>
+</ol>
+<h3>❌ استفاده نکنید وقتی:</h3>
+<ol>
+<li><strong>شیء ساده</strong>: شیء پارامترهای کمی دارد</li>
+<li><strong>بدون تنوع</strong>: نیاز به Builder های مختلف ندارید</li>
+<li><strong>ساخت ساده</strong>: فرآیند ساخت پیچیده نیست</li>
+</ol>
+<h2>🎯 کاربردهای واقعی</h2>
+<ol>
+<li><strong>StringBuilder در .NET</strong>: ساخت رشته‌های پیچیده</li>
+<li><strong>Query Builders</strong>: LINQ, Entity Framework</li>
+<li><strong>HTTP Request Builders</strong>: ساخت درخواست‌های HTTP</li>
+<li><strong>UI Builders</strong>: ساخت رابط کاربری (Android, SwiftUI)</li>
+<li><strong>Configuration Builders</strong>: پیکربندی برنامه‌ها</li>
+<li><strong>Test Data Builders</strong>: ساخت داده‌های تست</li>
+<li><strong>Document Builders</strong>: ساخت PDF, Word, Excel</li>
+</ol>
+<h2>💡 نکات پیاده‌سازی</h2>
+<ol>
+<li><strong>Fluent Interface</strong>: همیشه <code>this</code> را برگردانید تا Method Chaining ممکن شود</li>
+<li><strong>Validation در Build()</strong>: اعتبارسنجی را در متد Build انجام دهید</li>
+<li><strong>Builder داخلی (Nested Builder)</strong>: می‌توانید Builder را درون کلاس محصول بگذارید:<pre><code class="language-csharp">public class Computer 
+{
+    public class Builder 
+    {
+        // ...
+    }
+}
+</code></pre>
+</li>
+<li><strong>Reset Method</strong>: اگر می‌خواهید Builder را دوباره استفاده کنید، یک متد Reset اضافه کنید</li>
+<li><strong>Required vs Optional</strong>: برای فیلدهای اجباری، می‌توانید آن‌ها را در سازنده Builder بگذارید</li>
+</ol>
+<h2>🔑 نکته کلیدی</h2>
+<blockquote>
+<p><strong>یادآوری</strong>: Builder برای ساخت اشیاء <strong>پیچیده</strong> با مراحل <strong>متعدد</strong> است. اگر شیء ساده است، از سازنده معمولی استفاده کنید!</p>
+<p>در C#، می‌توانید از <strong>Object Initializer</strong> هم استفاده کنید:</p>
+<pre><code class="language-csharp">var computer = new Computer { CPU = &quot;i9&quot;, RAM = &quot;32GB&quot; };
+</code></pre>
+<p>اما Builder خوانایی بهتری دارد و می‌توانید validation و logic اضافه کنید.</p>
+</blockquote>
+<hr>
+<p><strong><a href="../index.html">🏠 بازگشت به صفحه اصلی</a></strong></p>

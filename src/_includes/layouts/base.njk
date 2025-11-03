@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="">
+<head>
+<meta name="description" content="آموزش فارسی الگوهای طراحی در برنامه‌نویسی با مثال‌های عملی و دسته‌بندی سطح‌ها.">
+<meta property="og:title" content="الگوهای طراحی فارسی">
+<meta property="og:description" content="منبع فارسی الگوهای طراحی با مسیر یادگیری گام‌به‌گام.">
+<meta property="og:image" content="/assets/images/preview.png">
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title or "الگوهای طراحی فارسی" }}</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body>
+  
+
+  {% include "components/header.njk" %}
+
+  <main class="container site-content">
+    {{ content | safe }}
+  </main>
+
+  {% include "components/footer.njk" %}
+
+  <script src="/assets/js/script.js" defer></script>
+  <script src="/assets/js/navigation.js" defer></script>
+  <script src="/assets/js/footer.js" defer></script>
+</body>
+</html>

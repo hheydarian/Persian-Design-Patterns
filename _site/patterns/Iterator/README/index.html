@@ -1,0 +1,259 @@
+<h1>الگوی Iterator (تکرارگر / پیمایشگر)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی Iterator یک الگوی طراحی رفتاری است که به شما اجازه می‌دهد عناصر یک مجموعه را بدون افشای نمایش زیرین آن (لیست، پشته، درخت و غیره) پیمایش کنید.</p>
+<h2>🤔 مشکل</h2>
+<p>مجموعه‌ها یکی از پرکاربردترین انواع داده در برنامه‌نویسی هستند. با این حال، یک مجموعه فقط یک ظرف برای گروهی از اشیاء است.</p>
+<p>بیشتر مجموعه‌ها عناصر خود را در لیست‌های ساده ذخیره می‌کنند. اما برخی از آن‌ها بر اساس پشته‌ها، درخت‌ها، نمودارها و دیگر ساختارهای داده پیچیده هستند.</p>
+<p>بدون توجه به اینکه یک مجموعه چگونه ساختار داده شده است، باید راهی برای دسترسی به عناصر آن فراهم کند تا کد دیگر بتواند از این عناصر استفاده کند.</p>
+<h2>💡 راه‌حل</h2>
+<p>ایده اصلی الگوی Iterator این است که رفتار پیمایش یک مجموعه را به یک شیء جداگانه به نام iterator منتقل کنید.</p>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+using System.Collections;
+using System.Collections.Generic;
+
+// رابط Iterator - برای پیمایش مجموعه
+public interface IBookIterator
+{
+    bool HasNext();
+    string Next();
+    void Reset();
+}
+
+// رابط Collection - برای ایجاد Iterator
+public interface IBookCollection
+{
+    void AddBook(string book);
+    IBookIterator CreateIterator();
+    int Count { get; }
+}
+
+// Concrete Iterator - پیاده‌سازی واقعی Iterator
+public class BookIterator : IBookIterator
+{
+    private readonly List&lt;string&gt; _books;
+    private int _position = 0;
+
+    public BookIterator(List&lt;string&gt; books)
+    {
+        _books = books;
+    }
+
+    // بررسی وجود عنصر بعدی
+    public bool HasNext()
+    {
+        return _position &lt; _books.Count;
+    }
+
+    // دریافت عنصر بعدی
+    public string Next()
+    {
+        if (!HasNext())
+        {
+            throw new InvalidOperationException(&quot;عنصر دیگری برای پیمایش وجود ندارد&quot;);
+        }
+        
+        string book = _books[_position];
+        _position++;
+        return book;
+    }
+
+    // بازنشانی موقعیت به ابتدا
+    public void Reset()
+    {
+        _position = 0;
+    }
+}
+
+// Reverse Iterator - پیمایش معکوس
+public class ReverseBookIterator : IBookIterator
+{
+    private readonly List&lt;string&gt; _books;
+    private int _position;
+
+    public ReverseBookIterator(List&lt;string&gt; books)
+    {
+        _books = books;
+        _position = books.Count - 1;
+    }
+
+    public bool HasNext()
+    {
+        return _position &gt;= 0;
+    }
+
+    public string Next()
+    {
+        if (!HasNext())
+        {
+            throw new InvalidOperationException(&quot;عنصر دیگری برای پیمایش وجود ندارد&quot;);
+        }
+        
+        string book = _books[_position];
+        _position--;
+        return book;
+    }
+
+    public void Reset()
+    {
+        _position = _books.Count - 1;
+    }
+}
+
+// Concrete Collection - مجموعه کتاب‌ها
+public class BookCollection : IBookCollection, IEnumerable&lt;string&gt;
+{
+    private readonly List&lt;string&gt; _books = new List&lt;string&gt;();
+
+    // افزودن کتاب به مجموعه
+    public void AddBook(string book)
+    {
+        _books.Add(book);
+        Console.WriteLine($&quot;✅ کتاب '{book}' به مجموعه اضافه شد&quot;);
+    }
+
+    // تعداد کتاب‌ها
+    public int Count =&gt; _books.Count;
+
+    // ایجاد Iterator پیش‌فرض (از اول به آخر)
+    public IBookIterator CreateIterator()
+    {
+        return new BookIterator(_books);
+    }
+
+    // ایجاد Iterator معکوس (از آخر به اول)
+    public IBookIterator CreateReverseIterator()
+    {
+        return new ReverseBookIterator(_books);
+    }
+
+    // پیاده‌سازی IEnumerable برای پشتیبانی از foreach
+    public IEnumerator&lt;string&gt; GetEnumerator()
+    {
+        return _books.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+}
+
+// استفاده از الگو
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(&quot;📚 الگوی Iterator - مجموعه کتاب\n&quot;);
+        Console.WriteLine(new string('=', 60));
+
+        // ایجاد مجموعه و افزودن کتاب‌ها
+        BookCollection collection = new BookCollection();
+        Console.WriteLine(&quot;\n📖 افزودن کتاب‌ها به مجموعه:&quot;);
+        Console.WriteLine(new string('-', 60));
+        collection.AddBook(&quot;شازده کوچولو&quot;);
+        collection.AddBook(&quot;صد سال تنهایی&quot;);
+        collection.AddBook(&quot;بوف کور&quot;);
+        collection.AddBook(&quot;گلستان سعدی&quot;);
+        collection.AddBook(&quot;مثنوی معنوی&quot;);
+
+        Console.WriteLine($&quot;\n📊 تعداد کتاب‌ها: {collection.Count}&quot;);
+
+        // روش 1: استفاده از Iterator دستی (از اول به آخر)
+        Console.WriteLine(&quot;\n🔄 پیمایش از اول به آخر (با Iterator دستی):&quot;);
+        Console.WriteLine(new string('-', 60));
+        IBookIterator iterator = collection.CreateIterator();
+        int bookNumber = 1;
+        while (iterator.HasNext())
+        {
+            string book = iterator.Next();
+            Console.WriteLine($&quot;📖 {bookNumber}. {book}&quot;);
+            bookNumber++;
+        }
+
+        // روش 2: استفاده از Iterator معکوس (از آخر به اول)
+        Console.WriteLine(&quot;\n🔄 پیمایش از آخر به اول (با Iterator معکوس):&quot;);
+        Console.WriteLine(new string('-', 60));
+        IBookIterator reverseIterator = collection.CreateReverseIterator();
+        bookNumber = 1;
+        while (reverseIterator.HasNext())
+        {
+            string book = reverseIterator.Next();
+            Console.WriteLine($&quot;📖 {bookNumber}. {book}&quot;);
+            bookNumber++;
+        }
+
+        // روش 3: استفاده از foreach (به لطف IEnumerable)
+        Console.WriteLine(&quot;\n🔄 پیمایش با foreach:&quot;);
+        Console.WriteLine(new string('-', 60));
+        bookNumber = 1;
+        foreach (string book in collection)
+        {
+            Console.WriteLine($&quot;📖 {bookNumber}. {book}&quot;);
+            bookNumber++;
+        }
+
+        // نمایش قابلیت Reset
+        Console.WriteLine(&quot;\n🔄 بازنشانی Iterator و پیمایش مجدد:&quot;);
+        Console.WriteLine(new string('-', 60));
+        iterator.Reset();
+        Console.WriteLine($&quot;📖 اولین کتاب: {iterator.Next()}&quot;);
+        Console.WriteLine($&quot;📖 دومین کتاب: {iterator.Next()}&quot;);
+    }
+}
+
+/* خروجی:
+📚 الگوی Iterator - مجموعه کتاب
+
+============================================================
+
+📖 افزودن کتاب‌ها به مجموعه:
+------------------------------------------------------------
+✅ کتاب 'شازده کوچولو' به مجموعه اضافه شد
+✅ کتاب 'صد سال تنهایی' به مجموعه اضافه شد
+✅ کتاب 'بوف کور' به مجموعه اضافه شد
+✅ کتاب 'گلستان سعدی' به مجموعه اضافه شد
+✅ کتاب 'مثنوی معنوی' به مجموعه اضافه شد
+
+📊 تعداد کتاب‌ها: 5
+
+🔄 پیمایش از اول به آخر (با Iterator دستی):
+------------------------------------------------------------
+📖 1. شازده کوچولو
+📖 2. صد سال تنهایی
+📖 3. بوف کور
+📖 4. گلستان سعدی
+📖 5. مثنوی معنوی
+
+🔄 پیمایش از آخر به اول (با Iterator معکوس):
+------------------------------------------------------------
+📖 1. مثنوی معنوی
+📖 2. گلستان سعدی
+📖 3. بوف کور
+📖 4. صد سال تنهایی
+📖 5. شازده کوچولو
+
+🔄 پیمایش با foreach:
+------------------------------------------------------------
+📖 1. شازده کوچولو
+📖 2. صد سال تنهایی
+📖 3. بوف کور
+📖 4. گلستان سعدی
+📖 5. مثنوی معنوی
+
+🔄 بازنشانی Iterator و پیمایش مجدد:
+------------------------------------------------------------
+📖 اولین کتاب: شازده کوچولو
+📖 دومین کتاب: صد سال تنهایی
+*/
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li><strong>زمانی که می‌خواهید جزئیات پیمایش مجموعه را پنهان کنید</strong></li>
+<li><strong>زمانی که می‌خواهید از چندین نوع پیمایش پشتیبانی کنید</strong></li>
+<li><strong>زمانی که می‌خواهید رابط یکنواختی برای پیمایش ساختارهای مختلف داشته باشید</strong></li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: Iterator به شما اجازه می‌دهد مجموعه‌ها را بدون دانستن ساختار داخلی آن‌ها پیمایش کنید! 🔄</p>
+</blockquote>

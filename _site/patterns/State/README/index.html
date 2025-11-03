@@ -1,0 +1,154 @@
+<h1>الگوی State (وضعیت / حالت)</h1>
+<h2>🎯 هدف</h2>
+<p>الگوی State یک الگوی طراحی رفتاری است که به یک شیء اجازه می‌دهد رفتار خود را تغییر دهد وقتی وضعیت داخلی آن تغییر می‌کند. به نظر می‌رسد شیء کلاس خود را تغییر داده است.</p>
+<h2>💻 مثال کد (C#)</h2>
+<pre><code class="language-csharp">using System;
+
+namespace StatePattern
+{
+    // رابط State - وضعیت
+    public interface IState
+    {
+        void InsertCoin(VendingMachine machine);
+        void EjectCoin(VendingMachine machine);
+        void Dispense(VendingMachine machine);
+    }
+
+    // Concrete State - وضعیت بدون سکه
+    public class NoCoinState : IState
+    {
+        public void InsertCoin(VendingMachine machine)
+        {
+            Console.WriteLine(&quot;💰 سکه وارد شد&quot;);
+            machine.SetState(machine.HasCoinState);
+        }
+
+        public void EjectCoin(VendingMachine machine)
+        {
+            Console.WriteLine(&quot;❌ سکه‌ای وجود ندارد&quot;);
+        }
+
+        public void Dispense(VendingMachine machine)
+        {
+            Console.WriteLine(&quot;❌ لطفاً ابتدا سکه وارد کنید&quot;);
+        }
+    }
+
+    // Concrete State - وضعیت دارای سکه
+    public class HasCoinState : IState
+    {
+        public void InsertCoin(VendingMachine machine)
+        {
+            Console.WriteLine(&quot;⚠️ قبلاً سکه وارد شده است&quot;);
+        }
+
+        public void EjectCoin(VendingMachine machine)
+        {
+            Console.WriteLine(&quot;💸 سکه برگردانده شد&quot;);
+            machine.SetState(machine.NoCoinState);
+        }
+
+        public void Dispense(VendingMachine machine)
+        {
+            Console.WriteLine(&quot;🥤 نوشیدنی در حال خروج...&quot;);
+            machine.SetState(machine.NoCoinState);
+        }
+    }
+
+    // Context - دستگاه فروش خودکار
+    public class VendingMachine
+    {
+        public IState NoCoinState { get; private set; }
+        public IState HasCoinState { get; private set; }
+        private IState _currentState;
+
+        public VendingMachine()
+        {
+            NoCoinState = new NoCoinState();
+            HasCoinState = new HasCoinState();
+            _currentState = NoCoinState;
+        }
+
+        public void SetState(IState state)
+        {
+            _currentState = state;
+        }
+
+        public void InsertCoin()
+        {
+            _currentState.InsertCoin(this);
+        }
+
+        public void EjectCoin()
+        {
+            _currentState.EjectCoin(this);
+        }
+
+        public void Dispense()
+        {
+            _currentState.Dispense(this);
+        }
+    }
+
+    // برنامه اصلی
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine(&quot;🎭 الگوی State - دستگاه فروش خودکار\n&quot;);
+            Console.WriteLine(new string('=', 60));
+
+            VendingMachine machine = new VendingMachine();
+
+            Console.WriteLine(&quot;\n🔄 سناریو 1: وارد کردن سکه و دریافت نوشیدنی&quot;);
+            Console.WriteLine(new string('-', 60));
+            machine.InsertCoin();
+            machine.Dispense();
+
+            Console.WriteLine(&quot;\n🔄 سناریو 2: تلاش برای دریافت نوشیدنی بدون سکه&quot;);
+            Console.WriteLine(new string('-', 60));
+            machine.Dispense();
+
+            Console.WriteLine(&quot;\n🔄 سناریو 3: وارد کردن و برگرداندن سکه&quot;);
+            Console.WriteLine(new string('-', 60));
+            machine.InsertCoin();
+            machine.EjectCoin();
+
+            Console.WriteLine(&quot;\n&quot; + new string('=', 60));
+        }
+    }
+}
+</code></pre>
+<h3>📤 خروجی برنامه:</h3>
+<pre><code>🎭 الگوی State - دستگاه فروش خودکار
+
+============================================================
+
+🔄 سناریو 1: وارد کردن سکه و دریافت نوشیدنی
+------------------------------------------------------------
+💰 سکه وارد شد
+🥤 نوشیدنی در حال خروج...
+
+🔄 سناریو 2: تلاش برای دریافت نوشیدنی بدون سکه
+------------------------------------------------------------
+❌ لطفاً ابتدا سکه وارد کنید
+
+🔄 سناریو 3: وارد کردن و برگرداندن سکه
+------------------------------------------------------------
+💰 سکه وارد شد
+💸 سکه برگردانده شد
+
+============================================================
+</code></pre>
+<h2>🔍 چه زمانی استفاده کنیم؟</h2>
+<ol>
+<li>زمانی که شیء رفتار متفاوتی بسته به وضعیت فعلی دارد</li>
+<li>زمانی که کلاس شما دارای دستورات شرطی بزرگ است</li>
+<li>زمانی که کد تکراری زیادی در حالت‌های مشابه دارید</li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>یادآوری</strong>: State رفتار شیء را بسته به وضعیت آن تغییر می‌دهد! 🔄</p>
+</blockquote>
