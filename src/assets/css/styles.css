@@ -96,7 +96,6 @@ a:hover {
 }
 .site-content {
     padding-top: 8rem;
-    
 }
 
 /* Header */
@@ -308,74 +307,135 @@ h2.section-title {
     gap: var(--s-xl);
     margin-bottom: var(--s-2xl);
 }
-.pattern-card {
-    position: relative;
-    background: var(--surface);
-    border: 1.5px solid var(--bd-1);
-    border-radius: var(--r-2xl);
-    padding: var(--s-2xl);
-    box-shadow: var(--sh-md);
-    cursor: pointer;
-    transition: transform var(--tr), box-shadow var(--tr),
-        border-color var(--tr);
-}
-.pattern-card:hover {
-    transform: translateY(-6px) scale(1.01);
-    box-shadow: var(--sh-lg);
-    border-color: transparent;
-    outline: 2px solid transparent;
-}
-.pattern-number {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    width: 48px;
-    height: 48px;
-    border-radius: var(--r-full);
+/* --- Modern & Minimal Pattern Cards --- */
+.patterns-grid {
     display: grid;
-    place-items: center;
-    color: #fff;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--primary), var(--primary-2));
-    box-shadow: var(--sh-lg);
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--s-lg);
+    margin-bottom: var(--s-2xl);
 }
-.pattern-icon {
-    font-size: 2.6rem;
-    margin: 1rem 0 0.6rem;
+
+/* ========================== */
+/*     Pattern Cards V2       */
+/* ========================== */
+
+.patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
 }
-.pattern-title {
-    font-weight: 800;
-    margin: 0.4rem 0;
-}
-.pattern-description {
-    color: var(--t-2);
-    margin: 0 0 var(--s-lg);
-}
-.category-badge {
-    display: inline-block;
-    padding: 0.35rem 0.7rem;
-    border-radius: 9999px;
-    border: 2px solid rgba(99, 102, 241, 0.25);
-    margin-top: 0.4rem;
-    font-weight: 700;
-}
-.badge-creational {
-    color: var(--primary);
-    background: rgba(99, 102, 241, 0.1);
-}
-.badge-structural {
-    color: var(--primary-2);
-    background: rgba(139, 92, 246, 0.12);
-}
-.badge-behavioral {
-    color: var(--accent);
-    background: rgba(236, 72, 153, 0.12);
-}
-.pattern-links {
+
+.pattern-card {
+    background: var(--surface);
+    border-radius: 1.2rem;
+    padding: 1.6rem 1.2rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--bd-1);
+    transition: all 0.3s ease;
     display: flex;
-    gap: 0.6rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: space-between;
+    text-decoration: none;
+    color: inherit;
 }
+
+.pattern-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.15);
+    border-color: var(--primary);
+}
+
+.pattern-icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.8rem;
+    transition: transform 0.3s ease;
+}
+.pattern-card:hover .pattern-icon {
+    transform: scale(1.1);
+}
+
+.pattern-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0.3rem 0;
+}
+
+.pattern-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    margin-bottom: 0.7rem;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.level-beginner {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+}
+.level-intermediate {
+    background: rgba(99, 102, 241, 0.12);
+    color: #6366f1;
+}
+.level-advanced {
+    background: rgba(236, 72, 153, 0.12);
+    color: #ec4899;
+}
+
+.pattern-desc {
+    font-size: 0.85rem;
+    color: var(--t-3);
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+    min-height: 2.6em;
+}
+
+.pattern-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    padding: 0.5rem 0;
+    border-radius: 0.7rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-link {
+    color: var(--primary);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.btn-link:hover {
+    color: var(--primary-2);
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+    .patterns-grid {
+        gap: 1rem;
+    }
+    .pattern-card {
+        padding: 1.2rem;
+    }
+}
+
 .btn {
     position: relative;
     display: inline-flex;
@@ -517,6 +577,19 @@ code {
     .patterns-grid {
         grid-template-columns: 1fr;
     }
+    .pattern-card {
+        padding: var(--s-lg);
+    }
+    .pattern-icon {
+        font-size: 1.8rem;
+    }
+    .pattern-title {
+        font-size: 0.95rem;
+    }
+    .btn {
+        padding: 0.35rem 0.8rem;
+        font-size: 0.85rem;
+    }
 }
 /* ===================== Navbar ===================== */
 .navbar {
@@ -604,6 +677,14 @@ code {
     transform: scale(1.1);
     background: var(--primary);
     color: #fff;
+}
+[data-theme="dark"] .pattern-card {
+    background: var(--bg-2);
+    border-color: var(--bd-2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+[data-theme="dark"] .pattern-card:hover {
+    box-shadow: 0 10px 24px rgba(99, 102, 241, 0.25);
 }
 
 /* دارک مود */

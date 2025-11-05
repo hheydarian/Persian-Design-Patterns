@@ -93,6 +93,25 @@ title: صفحه اصلی
 </section>
 
 <section id="all" class="section">
-    <h2 class="section-title"><span>📚</span><span>همهٔ الگوها</span></h2>
-    <!-- همون کارت‌هایی که داشتی اینجا می‌مونن -->
+    <h2 class="section-title"><span>📚</span><span>همهٔ الگوها به ترتیب یادگیری</span></h2>
+
+    <div class="patterns-grid">
+        {% for pattern in patterns %}
+        <a href="{{ pattern.path }}" class="pattern-card">
+            <div class="pattern-icon">{{ pattern.icon }}</div>
+            <h3 class="pattern-title">{{ pattern.name }}</h3>
+            <span
+                class="pattern-badge {% if pattern.level == 'beginner' %}level-beginner{% elseif pattern.level == 'intermediate' %}level-intermediate{% else %}level-advanced{% endif %}">
+                {% if pattern.level == 'beginner' %}مبتدی{% elseif pattern.level == 'intermediate' %}متوسط{% else
+                %}پیشرفته{% endif %}
+            </span>
+            <p class="pattern-desc">{{ pattern.desc }}</p>
+            <div class="pattern-actions">
+                <button class="btn-primary">نمایش</button>
+                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src{{ pattern.path }}"
+                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
 </section>

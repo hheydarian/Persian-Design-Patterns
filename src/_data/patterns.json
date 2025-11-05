@@ -1,0 +1,178 @@
+[
+    {
+        "id": 1,
+        "name": "Singleton",
+        "icon": "👑",
+        "level": "beginner",
+        "desc": "اطمینان از وجود تنها یک نمونه از کلاس در برنامه.",
+        "path": "/patterns/Singleton/"
+    },
+    {
+        "id": 2,
+        "name": "Factory Method",
+        "icon": "🏭",
+        "level": "beginner",
+        "desc": "ایجاد اشیاء بدون نیاز به تعیین کلاس دقیق آن‌ها.",
+        "path": "/patterns/Factory-Method/"
+    },
+    {
+        "id": 3,
+        "name": "Builder",
+        "icon": "👷",
+        "level": "beginner",
+        "desc": "جدا کردن ساخت اشیاء پیچیده از نمایش آن‌ها.",
+        "path": "/patterns/Builder/"
+    },
+    {
+        "id": 4,
+        "name": "Adapter",
+        "icon": "🔌",
+        "level": "beginner",
+        "desc": "تطبیق یک رابط با رابط مورد انتظار دیگر.",
+        "path": "/patterns/Adapter/"
+    },
+    {
+        "id": 5,
+        "name": "Facade",
+        "icon": "🏛️",
+        "level": "beginner",
+        "desc": "پنهان کردن پیچیدگی‌ها پشت یک رابط ساده.",
+        "path": "/patterns/Facade/"
+    },
+    {
+        "id": 6,
+        "name": "Strategy",
+        "icon": "🎯",
+        "level": "intermediate",
+        "desc": "تعویض الگوریتم‌ها در زمان اجرا.",
+        "path": "/patterns/Strategy/"
+    },
+    {
+        "id": 7,
+        "name": "Observer",
+        "icon": "👁️",
+        "level": "intermediate",
+        "desc": "اطلاع‌رسانی خودکار تغییرات به چند گیرنده.",
+        "path": "/patterns/Observer/"
+    },
+    {
+        "id": 8,
+        "name": "Decorator",
+        "icon": "🎁",
+        "level": "intermediate",
+        "desc": "افزودن رفتار جدید بدون تغییر کد اصلی.",
+        "path": "/patterns/Decorator/"
+    },
+    {
+        "id": 9,
+        "name": "Command",
+        "icon": "🎮",
+        "level": "intermediate",
+        "desc": "درخواست‌ها را به اشیاء جداگانه برای کنترل بهتر تبدیل می‌کند.",
+        "path": "/patterns/Command/"
+    },
+    {
+        "id": 10,
+        "name": "Template Method",
+        "icon": "📋",
+        "level": "intermediate",
+        "desc": "تعریف اسکلت الگوریتم و واگذاری جزئیات به زیرکلاس‌ها.",
+        "path": "/patterns/Template-Method/"
+    },
+    {
+        "id": 11,
+        "name": "Abstract Factory",
+        "icon": "🏗️",
+        "level": "advanced",
+        "desc": "ساخت خانواده‌ای از اشیاء مرتبط بدون تعیین کلاس‌هایشان.",
+        "path": "/patterns/Abstract-Factory/"
+    },
+    {
+        "id": 12,
+        "name": "Prototype",
+        "icon": "🧬",
+        "level": "advanced",
+        "desc": "ایجاد اشیاء جدید با کپی از نمونه‌های موجود.",
+        "path": "/patterns/Prototype/"
+    },
+    {
+        "id": 13,
+        "name": "Proxy",
+        "icon": "🛡️",
+        "level": "advanced",
+        "desc": "نماینده‌ای برای کنترل دسترسی به شیء دیگر.",
+        "path": "/patterns/Proxy/"
+    },
+    {
+        "id": 14,
+        "name": "Bridge",
+        "icon": "🌉",
+        "level": "advanced",
+        "desc": "جداسازی انتزاع از پیاده‌سازی برای توسعه مستقل.",
+        "path": "/patterns/Bridge/"
+    },
+    {
+        "id": 15,
+        "name": "Composite",
+        "icon": "🌳",
+        "level": "advanced",
+        "desc": "نمایش ساختار درختی اشیاء با رابط یکسان.",
+        "path": "/patterns/Composite/"
+    },
+    {
+        "id": 16,
+        "name": "Flyweight",
+        "icon": "🪶",
+        "level": "advanced",
+        "desc": "کاهش حافظه با اشتراک داده‌های مشترک.",
+        "path": "/patterns/Flyweight/"
+    },
+    {
+        "id": 17,
+        "name": "Chain of Responsibility",
+        "icon": "🔗",
+        "level": "advanced",
+        "desc": "ارسال درخواست بین زنجیره‌ای از اشیاء پردازشگر.",
+        "path": "/patterns/Chain-of-Responsibility/"
+    },
+    {
+        "id": 18,
+        "name": "Iterator",
+        "icon": "🔄",
+        "level": "advanced",
+        "desc": "دسترسی به عناصر مجموعه بدون افشای ساختار داخلی.",
+        "path": "/patterns/Iterator/"
+    },
+    {
+        "id": 19,
+        "name": "Mediator",
+        "icon": "🤝",
+        "level": "advanced",
+        "desc": "کاهش وابستگی بین اشیاء با استفاده از واسطه.",
+        "path": "/patterns/Mediator/"
+    },
+    {
+        "id": 20,
+        "name": "Memento",
+        "icon": "📸",
+        "level": "advanced",
+        "desc": "ذخیره و بازگردانی وضعیت قبلی اشیاء.",
+        "path": "/patterns/Memento/"
+    },
+    {
+        "id": 21,
+        "name": "State",
+        "icon": "🎭",
+        "level": "advanced",
+        "desc": "تغییر رفتار شیء بر اساس وضعیت داخلی آن.",
+        "path": "/patterns/State/"
+    },
+    {
+        "id": 22,
+        "name": "Visitor",
+        "icon": "👤",
+        "level": "advanced",
+        "desc": "افزودن رفتار جدید بدون تغییر ساختار کلاس‌ها.",
+        "path": "/patterns/Visitor/"
+    }
+]
