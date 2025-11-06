@@ -119,16 +119,7 @@ a:hover {
     gap: 0.7rem;
     color: inherit;
 }
-.logo-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, #fff, rgba(255, 255, 255, 0.3));
-}
-.logo-text {
-    font-weight: 700;
-    letter-spacing: -0.02em;
-}
+
 .nav ul {
     display: flex;
     align-items: center;
@@ -315,43 +306,42 @@ h2.section-title {
     margin-bottom: var(--s-2xl);
 }
 
-/* ========================== */
-/*     Pattern Cards V2       */
-/* ========================== */
+/* ============================= */
+/*    Pattern Cards - Modern V5  */
+/* ============================= */
 
-.patterns-grid {
+.patterns-gallery {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
+    gap: 1.6rem;
+    margin-top: 2rem;
 }
 
 .pattern-card {
     background: var(--surface);
-    border-radius: 1.2rem;
-    padding: 1.6rem 1.2rem;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--bd-1);
-    transition: all 0.3s ease;
+    border-radius: 1rem;
+    padding: 1.5rem 1.2rem;
+    text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    text-decoration: none;
-    color: inherit;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
 }
 
 .pattern-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.15);
     border-color: var(--primary);
+    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.15);
 }
 
 .pattern-icon {
-    font-size: 2.2rem;
-    margin-bottom: 0.8rem;
+    font-size: 2rem;
+    margin-bottom: 0.6rem;
     transition: transform 0.3s ease;
 }
+
 .pattern-card:hover .pattern-icon {
     transform: scale(1.1);
 }
@@ -359,44 +349,80 @@ h2.section-title {
 .pattern-title {
     font-size: 1.05rem;
     font-weight: 700;
-    margin: 0.3rem 0;
-}
-
-.pattern-badge {
-    display: inline-block;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.6rem;
-    border-radius: 999px;
-    margin-bottom: 0.7rem;
-    font-weight: 600;
-    opacity: 0.9;
-}
-
-.level-beginner {
-    background: rgba(16, 185, 129, 0.12);
-    color: #10b981;
-}
-.level-intermediate {
-    background: rgba(99, 102, 241, 0.12);
-    color: #6366f1;
-}
-.level-advanced {
-    background: rgba(236, 72, 153, 0.12);
-    color: #ec4899;
+    color: var(--t-1);
+    margin-bottom: 0.3rem;
 }
 
 .pattern-desc {
     font-size: 0.85rem;
     color: var(--t-3);
-    margin-bottom: 1.2rem;
-    line-height: 1.6;
-    min-height: 2.6em;
+    margin-bottom: 0.9rem;
+    line-height: 1.5;
+    min-height: 2.4em;
 }
 
-.pattern-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
+/* سطح */
+.pattern-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    margin-bottom: 1rem;
+}
+
+.pattern-badge.bgn {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+.pattern-badge.mid {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+}
+.pattern-badge.adv {
+    background: rgba(236, 72, 153, 0.1);
+    color: #ec4899;
+}
+
+/* دکمه مشاهده */
+.pattern-button {
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: #fff;
+    border: none;
+    font-family: "Vazir";
+    border-radius: 0.6rem;
+    font-size: 0.85rem;
+    padding: 0.55rem 0;
+    width: 100%;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.pattern-button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+/* حالت تاریک */
+[data-theme="dark"] .pattern-card {
+    background: var(--bg-2);
+    border-color: var(--bd-2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .pattern-card:hover {
+    box-shadow: 0 12px 26px rgba(99, 102, 241, 0.25);
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+    .patterns-gallery {
+        gap: 1rem;
+    }
+    .pattern-card {
+        padding: 1.2rem;
+    }
 }
 
 .btn-primary {
@@ -621,8 +647,11 @@ code {
 }
 
 /* لوگو (راست چین) */
+/* ======================= */
+/*     Navbar - Logo       */
+/* ======================= */
+
 .nav-logo {
-    justify-self: start;
     display: flex;
     align-items: center;
     gap: 0.6rem;
@@ -630,11 +659,26 @@ code {
     color: var(--t-1);
     font-weight: 700;
 }
-.logo-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+
+.logo-img {
+    height: 34px;
+    width: auto;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+.nav-logo:hover .logo-img {
+    transform: scale(1.08);
+}
+
+.logo-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--t-1);
+}
+
+[data-theme="dark"] .logo-img {
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.25));
 }
 
 /* منو وسط‌چین */
@@ -708,5 +752,133 @@ code {
         width: 95%;
         border-radius: var(--r-xl);
         top: 0.4rem;
+    }
+}
+/* ========================================= */
+/*   Learning Path — Modern Gradient Style   */
+/* ========================================= */
+
+.learning-section {
+    margin: 4rem 0;
+    text-align: center;
+}
+
+.learning-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+    justify-items: center;
+}
+
+.learn-card {
+    position: relative;
+    background: linear-gradient(180deg, var(--surface), var(--bg-2));
+    border-radius: 1.5rem;
+    padding: 2rem 1.5rem;
+    width: 100%;
+    max-width: 320px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    border: 1.5px solid var(--bd-1);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(12px);
+}
+
+.learn-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 18px 40px rgba(99, 102, 241, 0.15);
+}
+
+/* رنگ‌های سطح */
+.level-beginner {
+    border-top: 5px solid #10b981;
+}
+.level-intermediate {
+    border-top: 5px solid #f59e0b;
+}
+.level-advanced {
+    border-top: 5px solid #ec4899;
+}
+
+/* آیکون بزرگ بالا */
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* تیتر */
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--t-1);
+    margin-bottom: 1rem;
+}
+
+/* لیست */
+.learn-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 1.4rem;
+    text-align: right;
+    color: var(--t-2);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    border-top: 1px dashed var(--bd-2);
+    padding-top: 1rem;
+    width: 85%;
+}
+
+/* حالت دارک */
+/* حالت دارک بهبودیافته */
+[data-theme="dark"] .learn-card {
+    /* پس‌زمینه روشن‌تر با لایه نیمه‌شفاف */
+    background: linear-gradient(
+        180deg,
+        rgba(30, 41, 59, 0.85),
+        rgba(15, 23, 42, 0.95)
+    );
+    border-color: rgba(148, 163, 184, 0.25);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(14px);
+}
+
+/* رنگ متن‌ها در حالت دارک */
+[data-theme="dark"] .card-title {
+    color: #f3f4f6; /* سفید ملایم */
+}
+[data-theme="dark"] .learn-card ul {
+    color: #cbd5e1; /* خاکستری روشن‌تر */
+    border-top: 1px dashed rgba(148, 163, 184, 0.3);
+}
+
+/* رنگ‌های سطح در حالت دارک – کمی درخشان‌تر */
+[data-theme="dark"] .level-beginner {
+    border-top-color: #34d399; /* سبز روشن‌تر */
+}
+[data-theme="dark"] .level-intermediate {
+    border-top-color: #fbbf24; /* زرد گرم‌تر */
+}
+[data-theme="dark"] .level-advanced {
+    border-top-color: #f472b6; /* صورتی نرم‌تر */
+}
+
+/* سایه در hover */
+[data-theme="dark"] .learn-card:hover {
+    box-shadow: 0 12px 30px rgba(99, 102, 241, 0.35);
+}
+
+/* موبایل: حالت کشویی افقی */
+@media (max-width: 768px) {
+    .learning-cards {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+        scroll-snap-type: x mandatory;
+    }
+    .learn-card {
+        min-width: 260px;
+        scroll-snap-align: center;
+        flex-shrink: 0;
     }
 }

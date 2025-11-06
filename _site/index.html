@@ -20,8 +20,8 @@
   <div class="nav-inner container">
     <!-- لوگو -->
     <a href="/" class="nav-logo">
-      <span class="logo-dot"></span>
-      <span class="logo-text">الگوهای طراحی فارسی</span>
+      <img src="/assets/images/logo.svg" alt="Persian Design Patterns Logo" class="logo-img">
+      <span class="logo-text">PatternHub</span>
     </a>
 
     <!-- منو -->
@@ -83,388 +83,476 @@
         </div>
     </div>
 </section>
+<section id="learning" class="learning-section">
+    <h2 class="section-title"><span>🧭</span><span>مسیر یادگیری پیشنهادی</span></h2>
+    <p class="section-subtitle">سه گام برای حرفه‌ای شدن در الگوهای طراحی</p>
 
-<section id="learning" class="learning-path-section">
-    <h2 class="section-title"><span>🛤️</span><span>مسیر یادگیری پیشنهادی</span></h2>
-    <p class="section-subtitle">از مبتدی به پیشرفته؛ به ترتیب شماره‌ها برو.</p>
+    <div class="learning-cards">
+        <!-- سطح ۱ -->
+        <div class="learn-card level-beginner">
+            <div class="card-icon">🌱</div>
+            <h3 class="card-title">سطح مبتدی</h3>
+            <ul>
+                <li>👑 Singleton</li>
+                <li>🏭 Factory Method</li>
+                <li>👷 Builder</li>
+                <li>🔌 Adapter</li>
+                <li>🏛️ Facade</li>
+            </ul>
 
-    <div class="learning-levels">
-        <div class="level-card level-beginner">
-            <h3><span>🌱</span> سطح مبتدی</h3>
-            <ol>
-                <li><a href="/src/patterns/Singleton/index.html">👑 Singleton</a></li>
-                <li><a href="/src/patterns/Factory-Method/index.html">🏭 Factory Method</a></li>
-                <li><a href="/src/patterns/Builder/index.html">👷 Builder</a></li>
-                <li><a href="/src/patterns/Adapter/index.html">🔌 Adapter</a></li>
-                <li><a href="/src/patterns/Facade/index.html">🏛️ Facade</a></li>
-            </ol>
         </div>
 
-        <div class="level-card level-intermediate">
-            <h3><span>🌿</span> سطح متوسط</h3>
-            <ol start="6">
-                <li><a href="/src/patterns/Strategy/index.html">🎯 Strategy</a></li>
-                <li><a href="/src/patterns/Observer/index.html">👁️ Observer</a></li>
-                <li><a href="/src/patterns/Decorator/index.html">🎁 Decorator</a></li>
-                <li><a href="/src/patterns/Command/index.html">🎮 Command</a></li>
-                <li><a href="/src/patterns/Template-Method/index.html">📋 Template Method</a></li>
-            </ol>
+        <!-- سطح ۲ -->
+        <div class="learn-card level-intermediate">
+            <div class="card-icon">🌿</div>
+            <h3 class="card-title">سطح متوسط</h3>
+            <ul>
+                <li>🎯 Strategy</li>
+                <li>👁️ Observer</li>
+                <li>🎁 Decorator</li>
+                <li>🎮 Command</li>
+                <li>📋 Template Method</li>
+            </ul>
+
         </div>
 
-        <div class="level-card level-advanced">
-            <h3><span>🌳</span> سطح پیشرفته</h3>
-            <ol start="11">
-                <li><a href="/src/patterns/Abstract-Factory/index.html">🏗️ Abstract Factory</a></li>
-                <li><a href="/src/patterns/Prototype/index.html">🧬 Prototype</a></li>
-                <li><a href="/src/patterns/Proxy/index.html">🛡️ Proxy</a></li>
-                <li><a href="/src/patterns/Bridge/index.html">🌉 Bridge</a></li>
-                <li><a href="/src/patterns/Composite/index.html">🌳 Composite</a></li>
-                <li><a href="/src/patterns/Flyweight/index.html">🪶 Flyweight</a></li>
-                <li><a href="/src/patterns/Chain-of-Responsibility/index.html">🔗 Chain of Responsibility</a></li>
-                <li><a href="/src/patterns/Iterator/index.html">🔄 Iterator</a></li>
-                <li><a href="/src/patterns/Mediator/index.html">🤝 Mediator</a></li>
-                <li><a href="/src/patterns/Memento/index.html">📸 Memento</a></li>
-                <li><a href="/src/patterns/State/index.html">🎭 State</a></li>
-                <li><a href="/src/patterns/Visitor/index.html">👤 Visitor</a></li>
-            </ol>
+        <!-- سطح ۳ -->
+        <div class="learn-card level-advanced">
+            <div class="card-icon">🌳</div>
+            <h3 class="card-title">سطح پیشرفته</h3>
+            <ul>
+                <li>🏗️ Abstract Factory</li>
+                <li>🧬 Prototype</li>
+                <li>🛡️ Proxy</li>
+                <li>🌉 Bridge</li>
+                <li>👤 Visitor</li>
+            </ul>
+
         </div>
     </div>
-
-    <div class="learning-tip">💡 <strong>نکته:</strong> با تمرین‌های کوچک جلو برو و بعد برو الگوی بعدی.</div>
 </section>
 
-<section id="all" class="section">
-    <h2 class="section-title"><span>📚</span><span>همهٔ الگوها به ترتیب یادگیری</span></h2>
 
-    <div class="patterns-grid">
+<section id="all" class="section">
+    <h2 class="section-title"><span>📚</span><span>همهٔ الگوها</span></h2>
+
+    <div class="patterns-gallery">
         
         <a href="/patterns/Singleton/" class="pattern-card">
-            <div class="pattern-icon">👑</div>
-            <h3 class="pattern-title">Singleton</h3>
-            <span
-                class="pattern-badge level-beginner">
-                مبتدی
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">👑</div>
+                <h3 class="pattern-title">Singleton</h3>
+            </div>
+
             <p class="pattern-desc">اطمینان از وجود تنها یک نمونه از کلاس در برنامه.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Singleton/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge beginner">
+                    
+                    Beginner
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Factory-Method/" class="pattern-card">
-            <div class="pattern-icon">🏭</div>
-            <h3 class="pattern-title">Factory Method</h3>
-            <span
-                class="pattern-badge level-beginner">
-                مبتدی
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🏭</div>
+                <h3 class="pattern-title">Factory Method</h3>
+            </div>
+
             <p class="pattern-desc">ایجاد اشیاء بدون نیاز به تعیین کلاس دقیق آن‌ها.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Factory-Method/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge beginner">
+                    
+                    Beginner
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Builder/" class="pattern-card">
-            <div class="pattern-icon">👷</div>
-            <h3 class="pattern-title">Builder</h3>
-            <span
-                class="pattern-badge level-beginner">
-                مبتدی
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">👷</div>
+                <h3 class="pattern-title">Builder</h3>
+            </div>
+
             <p class="pattern-desc">جدا کردن ساخت اشیاء پیچیده از نمایش آن‌ها.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Builder/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge beginner">
+                    
+                    Beginner
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Adapter/" class="pattern-card">
-            <div class="pattern-icon">🔌</div>
-            <h3 class="pattern-title">Adapter</h3>
-            <span
-                class="pattern-badge level-beginner">
-                مبتدی
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🔌</div>
+                <h3 class="pattern-title">Adapter</h3>
+            </div>
+
             <p class="pattern-desc">تطبیق یک رابط با رابط مورد انتظار دیگر.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Adapter/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge beginner">
+                    
+                    Beginner
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Facade/" class="pattern-card">
-            <div class="pattern-icon">🏛️</div>
-            <h3 class="pattern-title">Facade</h3>
-            <span
-                class="pattern-badge level-beginner">
-                مبتدی
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🏛️</div>
+                <h3 class="pattern-title">Facade</h3>
+            </div>
+
             <p class="pattern-desc">پنهان کردن پیچیدگی‌ها پشت یک رابط ساده.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Facade/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge beginner">
+                    
+                    Beginner
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Strategy/" class="pattern-card">
-            <div class="pattern-icon">🎯</div>
-            <h3 class="pattern-title">Strategy</h3>
-            <span
-                class="pattern-badge level-intermediate">
-                متوسط
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🎯</div>
+                <h3 class="pattern-title">Strategy</h3>
+            </div>
+
             <p class="pattern-desc">تعویض الگوریتم‌ها در زمان اجرا.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Strategy/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge intermediate">
+                    
+                    Intermediate
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Observer/" class="pattern-card">
-            <div class="pattern-icon">👁️</div>
-            <h3 class="pattern-title">Observer</h3>
-            <span
-                class="pattern-badge level-intermediate">
-                متوسط
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">👁️</div>
+                <h3 class="pattern-title">Observer</h3>
+            </div>
+
             <p class="pattern-desc">اطلاع‌رسانی خودکار تغییرات به چند گیرنده.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Observer/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge intermediate">
+                    
+                    Intermediate
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Decorator/" class="pattern-card">
-            <div class="pattern-icon">🎁</div>
-            <h3 class="pattern-title">Decorator</h3>
-            <span
-                class="pattern-badge level-intermediate">
-                متوسط
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🎁</div>
+                <h3 class="pattern-title">Decorator</h3>
+            </div>
+
             <p class="pattern-desc">افزودن رفتار جدید بدون تغییر کد اصلی.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Decorator/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge intermediate">
+                    
+                    Intermediate
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Command/" class="pattern-card">
-            <div class="pattern-icon">🎮</div>
-            <h3 class="pattern-title">Command</h3>
-            <span
-                class="pattern-badge level-intermediate">
-                متوسط
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🎮</div>
+                <h3 class="pattern-title">Command</h3>
+            </div>
+
             <p class="pattern-desc">درخواست‌ها را به اشیاء جداگانه برای کنترل بهتر تبدیل می‌کند.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Command/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge intermediate">
+                    
+                    Intermediate
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Template-Method/" class="pattern-card">
-            <div class="pattern-icon">📋</div>
-            <h3 class="pattern-title">Template Method</h3>
-            <span
-                class="pattern-badge level-intermediate">
-                متوسط
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">📋</div>
+                <h3 class="pattern-title">Template Method</h3>
+            </div>
+
             <p class="pattern-desc">تعریف اسکلت الگوریتم و واگذاری جزئیات به زیرکلاس‌ها.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Template-Method/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge intermediate">
+                    
+                    Intermediate
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Abstract-Factory/" class="pattern-card">
-            <div class="pattern-icon">🏗️</div>
-            <h3 class="pattern-title">Abstract Factory</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🏗️</div>
+                <h3 class="pattern-title">Abstract Factory</h3>
+            </div>
+
             <p class="pattern-desc">ساخت خانواده‌ای از اشیاء مرتبط بدون تعیین کلاس‌هایشان.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Abstract-Factory/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Prototype/" class="pattern-card">
-            <div class="pattern-icon">🧬</div>
-            <h3 class="pattern-title">Prototype</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🧬</div>
+                <h3 class="pattern-title">Prototype</h3>
+            </div>
+
             <p class="pattern-desc">ایجاد اشیاء جدید با کپی از نمونه‌های موجود.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Prototype/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Proxy/" class="pattern-card">
-            <div class="pattern-icon">🛡️</div>
-            <h3 class="pattern-title">Proxy</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🛡️</div>
+                <h3 class="pattern-title">Proxy</h3>
+            </div>
+
             <p class="pattern-desc">نماینده‌ای برای کنترل دسترسی به شیء دیگر.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Proxy/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Bridge/" class="pattern-card">
-            <div class="pattern-icon">🌉</div>
-            <h3 class="pattern-title">Bridge</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🌉</div>
+                <h3 class="pattern-title">Bridge</h3>
+            </div>
+
             <p class="pattern-desc">جداسازی انتزاع از پیاده‌سازی برای توسعه مستقل.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Bridge/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Composite/" class="pattern-card">
-            <div class="pattern-icon">🌳</div>
-            <h3 class="pattern-title">Composite</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🌳</div>
+                <h3 class="pattern-title">Composite</h3>
+            </div>
+
             <p class="pattern-desc">نمایش ساختار درختی اشیاء با رابط یکسان.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Composite/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Flyweight/" class="pattern-card">
-            <div class="pattern-icon">🪶</div>
-            <h3 class="pattern-title">Flyweight</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🪶</div>
+                <h3 class="pattern-title">Flyweight</h3>
+            </div>
+
             <p class="pattern-desc">کاهش حافظه با اشتراک داده‌های مشترک.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Flyweight/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Chain-of-Responsibility/" class="pattern-card">
-            <div class="pattern-icon">🔗</div>
-            <h3 class="pattern-title">Chain of Responsibility</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🔗</div>
+                <h3 class="pattern-title">Chain of Responsibility</h3>
+            </div>
+
             <p class="pattern-desc">ارسال درخواست بین زنجیره‌ای از اشیاء پردازشگر.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Chain-of-Responsibility/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Iterator/" class="pattern-card">
-            <div class="pattern-icon">🔄</div>
-            <h3 class="pattern-title">Iterator</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🔄</div>
+                <h3 class="pattern-title">Iterator</h3>
+            </div>
+
             <p class="pattern-desc">دسترسی به عناصر مجموعه بدون افشای ساختار داخلی.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Iterator/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Mediator/" class="pattern-card">
-            <div class="pattern-icon">🤝</div>
-            <h3 class="pattern-title">Mediator</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🤝</div>
+                <h3 class="pattern-title">Mediator</h3>
+            </div>
+
             <p class="pattern-desc">کاهش وابستگی بین اشیاء با استفاده از واسطه.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Mediator/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Memento/" class="pattern-card">
-            <div class="pattern-icon">📸</div>
-            <h3 class="pattern-title">Memento</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">📸</div>
+                <h3 class="pattern-title">Memento</h3>
+            </div>
+
             <p class="pattern-desc">ذخیره و بازگردانی وضعیت قبلی اشیاء.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Memento/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/State/" class="pattern-card">
-            <div class="pattern-icon">🎭</div>
-            <h3 class="pattern-title">State</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">🎭</div>
+                <h3 class="pattern-title">State</h3>
+            </div>
+
             <p class="pattern-desc">تغییر رفتار شیء بر اساس وضعیت داخلی آن.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/State/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         
         <a href="/patterns/Visitor/" class="pattern-card">
-            <div class="pattern-icon">👤</div>
-            <h3 class="pattern-title">Visitor</h3>
-            <span
-                class="pattern-badge level-advanced">
-                پیشرفته
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">👤</div>
+                <h3 class="pattern-title">Visitor</h3>
+            </div>
+
             <p class="pattern-desc">افزودن رفتار جدید بدون تغییر ساختار کلاس‌ها.</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src/patterns/Visitor/"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge advanced">
+                    
+                    Advanced
+                    
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         

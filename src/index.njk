@@ -42,74 +42,81 @@ title: صفحه اصلی
         </div>
     </div>
 </section>
+<section id="learning" class="learning-section">
+    <h2 class="section-title"><span>🧭</span><span>مسیر یادگیری پیشنهادی</span></h2>
+    <p class="section-subtitle">سه گام برای حرفه‌ای شدن در الگوهای طراحی</p>
 
-<section id="learning" class="learning-path-section">
-    <h2 class="section-title"><span>🛤️</span><span>مسیر یادگیری پیشنهادی</span></h2>
-    <p class="section-subtitle">از مبتدی به پیشرفته؛ به ترتیب شماره‌ها برو.</p>
+    <div class="learning-cards">
+        <!-- سطح ۱ -->
+        <div class="learn-card level-beginner">
+            <div class="card-icon">🌱</div>
+            <h3 class="card-title">سطح مبتدی</h3>
+            <ul>
+                <li>👑 Singleton</li>
+                <li>🏭 Factory Method</li>
+                <li>👷 Builder</li>
+                <li>🔌 Adapter</li>
+                <li>🏛️ Facade</li>
+            </ul>
 
-    <div class="learning-levels">
-        <div class="level-card level-beginner">
-            <h3><span>🌱</span> سطح مبتدی</h3>
-            <ol>
-                <li><a href="/src/patterns/Singleton/index.html">👑 Singleton</a></li>
-                <li><a href="/src/patterns/Factory-Method/index.html">🏭 Factory Method</a></li>
-                <li><a href="/src/patterns/Builder/index.html">👷 Builder</a></li>
-                <li><a href="/src/patterns/Adapter/index.html">🔌 Adapter</a></li>
-                <li><a href="/src/patterns/Facade/index.html">🏛️ Facade</a></li>
-            </ol>
         </div>
 
-        <div class="level-card level-intermediate">
-            <h3><span>🌿</span> سطح متوسط</h3>
-            <ol start="6">
-                <li><a href="/src/patterns/Strategy/index.html">🎯 Strategy</a></li>
-                <li><a href="/src/patterns/Observer/index.html">👁️ Observer</a></li>
-                <li><a href="/src/patterns/Decorator/index.html">🎁 Decorator</a></li>
-                <li><a href="/src/patterns/Command/index.html">🎮 Command</a></li>
-                <li><a href="/src/patterns/Template-Method/index.html">📋 Template Method</a></li>
-            </ol>
+        <!-- سطح ۲ -->
+        <div class="learn-card level-intermediate">
+            <div class="card-icon">🌿</div>
+            <h3 class="card-title">سطح متوسط</h3>
+            <ul>
+                <li>🎯 Strategy</li>
+                <li>👁️ Observer</li>
+                <li>🎁 Decorator</li>
+                <li>🎮 Command</li>
+                <li>📋 Template Method</li>
+            </ul>
+
         </div>
 
-        <div class="level-card level-advanced">
-            <h3><span>🌳</span> سطح پیشرفته</h3>
-            <ol start="11">
-                <li><a href="/src/patterns/Abstract-Factory/index.html">🏗️ Abstract Factory</a></li>
-                <li><a href="/src/patterns/Prototype/index.html">🧬 Prototype</a></li>
-                <li><a href="/src/patterns/Proxy/index.html">🛡️ Proxy</a></li>
-                <li><a href="/src/patterns/Bridge/index.html">🌉 Bridge</a></li>
-                <li><a href="/src/patterns/Composite/index.html">🌳 Composite</a></li>
-                <li><a href="/src/patterns/Flyweight/index.html">🪶 Flyweight</a></li>
-                <li><a href="/src/patterns/Chain-of-Responsibility/index.html">🔗 Chain of Responsibility</a></li>
-                <li><a href="/src/patterns/Iterator/index.html">🔄 Iterator</a></li>
-                <li><a href="/src/patterns/Mediator/index.html">🤝 Mediator</a></li>
-                <li><a href="/src/patterns/Memento/index.html">📸 Memento</a></li>
-                <li><a href="/src/patterns/State/index.html">🎭 State</a></li>
-                <li><a href="/src/patterns/Visitor/index.html">👤 Visitor</a></li>
-            </ol>
+        <!-- سطح ۳ -->
+        <div class="learn-card level-advanced">
+            <div class="card-icon">🌳</div>
+            <h3 class="card-title">سطح پیشرفته</h3>
+            <ul>
+                <li>🏗️ Abstract Factory</li>
+                <li>🧬 Prototype</li>
+                <li>🛡️ Proxy</li>
+                <li>🌉 Bridge</li>
+                <li>👤 Visitor</li>
+            </ul>
+
         </div>
     </div>
-
-    <div class="learning-tip">💡 <strong>نکته:</strong> با تمرین‌های کوچک جلو برو و بعد برو الگوی بعدی.</div>
 </section>
 
-<section id="all" class="section">
-    <h2 class="section-title"><span>📚</span><span>همهٔ الگوها به ترتیب یادگیری</span></h2>
 
-    <div class="patterns-grid">
+<section id="all" class="section">
+    <h2 class="section-title"><span>📚</span><span>همهٔ الگوها</span></h2>
+
+    <div class="patterns-gallery">
         {% for pattern in patterns %}
         <a href="{{ pattern.path }}" class="pattern-card">
-            <div class="pattern-icon">{{ pattern.icon }}</div>
-            <h3 class="pattern-title">{{ pattern.name }}</h3>
-            <span
-                class="pattern-badge {% if pattern.level == 'beginner' %}level-beginner{% elseif pattern.level == 'intermediate' %}level-intermediate{% else %}level-advanced{% endif %}">
-                {% if pattern.level == 'beginner' %}مبتدی{% elseif pattern.level == 'intermediate' %}متوسط{% else
-                %}پیشرفته{% endif %}
-            </span>
+            <div class="pattern-top">
+                <div class="pattern-icon">{{ pattern.icon }}</div>
+                <h3 class="pattern-title">{{ pattern.name }}</h3>
+            </div>
+
             <p class="pattern-desc">{{ pattern.desc }}</p>
-            <div class="pattern-actions">
-                <button class="btn-primary">نمایش</button>
-                <a href="https://github.com/hheydarian/Persian-Design-Patterns/tree/main/src{{ pattern.path }}"
-                    target="_blank" class="btn-link">گیت‌هاب ↗</a>
+
+            <div class="pattern-bottom">
+                <span class="pattern-badge {{ pattern.level }}">
+                    {% if pattern.level == 'beginner' %}
+                    Beginner
+                    {% elseif pattern.level == 'intermediate' %}
+                    Intermediate
+                    {% else %}
+                    Advanced
+                    {% endif %}
+                </span>
+
+                <button class="pattern-button">مشاهده</button>
             </div>
         </a>
         {% endfor %}
